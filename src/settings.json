@@ -55,7 +55,7 @@
         {
           "name": "Create Payment",
           "desc": "Membuat pembayaran baru",
-          "path": "/orderkuota/createpayment?apikey=&amount=&codeqr="
+          "path": "/orderkuota/createpayment?apikey=&amount=&codeqr=",
          "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
         }
       ]
