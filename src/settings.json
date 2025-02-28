@@ -75,6 +75,7 @@
         }
       ]
     },
+    {
       "name": "Downloader",
       "items": [
         {
@@ -85,7 +86,7 @@
         {
           "name": "Ytmp3",
           "desc": "Download Audio Youtube",
-          "path": "/download/ytmp3?url=",
+          "path": "/download/ytmp3?url="
         }
       ]
     },
