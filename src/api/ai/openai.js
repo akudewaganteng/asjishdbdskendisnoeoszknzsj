@@ -63,10 +63,10 @@ app.get("/ai/openai-prompt", async (req, res) => {
     if (!prompt || !msg) return res.json({ error: "Isi semua parameter!" });
 
     try {
-      const anu = await groq(msg, prompt);
+      const spongeee = await groq(msg, prompt);
       res.json({
-        status: anu.status,
-        result: anu.respon,
+        status: spongeee.status,
+        result: spongeee.respon,
       });
     } catch (error) {
       console.error(error);
