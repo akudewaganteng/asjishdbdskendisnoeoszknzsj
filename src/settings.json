@@ -28,21 +28,6 @@
   ],
   "categories": [
     {
-      "name": "Orderkuota Gateway",
-      "items": [
-        {
-          "name": "Cek Status",
-          "desc": "Cek Status Payment",
-          "path": "/orderkuota/cekstatus?apikey=&merchant=&keyorkut=",
-        },
-        {
-          "name": "Create Payment",
-          "desc": "Membuat Pembayaran Baru",
-          "path": "/orderkuota/createpayment?apikey=&amount=&codeqr="
-        }
-      ]
-    },
-    {
       "name": "AI (Artificial Intelligence)",
       "items": [
         {
@@ -55,6 +40,21 @@
           "desc": "Talk with hydromind",
           "path": "/ai/hydromind?text=&model=",
           "innerDesc": "See the list of supported AI models here: https://mind.hydrooo.web.id"
+        }
+      ]
+    },
+        {
+      "name": "Orderkouta Gateaway",
+      "items": [
+        {
+          "name": "Cek Status",
+          "desc": "Cek status orderkouta",
+          "path": "/orderkuota/cekstatus?apikey=&merchant=&keyorkut="
+        },
+        {
+          "name": "Create Payment",
+          "desc": "Membuat pembayaran baru",
+          "path": "/orderkuota/createpayment?apikey=&amount=&codeqr="
         }
       ]
     },
