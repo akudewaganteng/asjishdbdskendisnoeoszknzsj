@@ -14,7 +14,7 @@ module.exports = function (app) {
         apiKey: apikey,
     });
 
-    async function groq(teks, prompt = `sekarang kamu adalah ai yang mengetahui tentang semua bahasa pemrograman dan selalu gunakan bahasa Indonesia saat menjawab semua pertanyaan!`) {
+    async function groq(teks, prompt = `sekarang kamu adalah AI yang mengetahui tentang semua bahasa pemrograman dan selalu gunakan bahasa Indonesia saat menjawab semua pertanyaan!`) {
         try {
             const chatCompletion = await client.chat.completions.create({
                 messages: [
@@ -54,6 +54,22 @@ module.exports = function (app) {
         } catch (error) {
             console.error(error);
             res.status(500).json({ status: false, message: "An error occurred while fetching data." });
+        }
+    });
+
+    app.get("/ai/openai-prompt", async (req, res) => {
+        const { prompt, msg } = req.query;
+        if (!prompt || !msg) return res.json({ error: "Isi semua parameter!" });
+
+        try {
+            const anu = await groq(msg, prompt);
+            res.json({
+                status: anu.status,
+                result: anu.respon,
+            });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "An error occurred while fetching data." });
         }
     });
 };
