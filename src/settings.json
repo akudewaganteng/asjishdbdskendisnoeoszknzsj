@@ -5,7 +5,7 @@
   "header": {
     "status": "Online!",
     "imageSrc": [
-      "https://media4.giphy.com/media/MdLFOyVZtoUPm/giphy.gif?cid=6c09b952m51lme73oyoabmjw3qwy0vutsidg5o4q7yd2693q&ep=v1_internal_gif_by_id&rid=giphy.gif&ct=g"
+      "https://media4.giphy.com/media/l0Iy33dWjmywkCnNS/giphy.gif?cid=6c09b952p3mt40j1mgznfi9rwwtccbjl7mtc2kvfugymeinr&ep=v1_internal_gif_by_id&rid=giphy.gif&ct=g"
     ],
     "imageSize": {
       "mobile": "80%",
@@ -27,21 +27,6 @@
     }
   ],
   "categories": [
-    {
-      "name": "Orderkuota Gateway",
-      "items": [
-        {
-          "name": "Cek Status",
-          "desc": "Cek Status Payment",
-          "path": "/orderkuota/cekstatus?apikey=&merchant=&keyorkut=",
-        },
-        {
-          "name": "Create Payment",
-          "desc": "Membuat Pembayaran Baru",
-          "path": "/orderkuota/createpayment?apikey=&amount=&codeqr="
-        }
-      ]
-    },
     {
       "name": "AI (Artificial Intelligence)",
       "items": [
