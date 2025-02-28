@@ -14,7 +14,7 @@
     }
   },
   "apiSettings": {
-    "creator": "Appolo Nieh Dek"
+    "creator": "AppoloLonely---"
   },
   "links": [
     {
@@ -22,8 +22,12 @@
       "url": "https://github.com/rynxzyy/Rynn-UI"
     },
     {
+      "name": "Telegram Channel",
+      "url": "https://t.me/lahngcok"
+    },
+    {
       "name": "Contact Me",
-      "url": "https://wa.me/6285810749674"
+      "url": "https://t.me/tearsinsilencee"
     }
   ],
   "categories": [
@@ -45,6 +49,12 @@
           "name": "OpenAi",
           "desc": "Talk with OpenAi",
           "path": "/ai/openai?msg="
+        },
+       {
+          "name": "OpenAi Prompt",
+          "desc": "Open Ai With Prompt",
+          "path": "/ai/openai-prompt?prompt=&msg=",
+          "innerDesc": "Open Ai that uses prompts and text"
         }
       ]
     },
@@ -62,6 +72,20 @@
           "desc": "Membuat pembayaran baru",
           "path": "/orderkuota/createpayment?apikey=&amount=&codeqr=",
          "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
+        }
+      ]
+    },
+      "name": "Downloader",
+      "items": [
+        {
+          "name": "Ytmp4",
+          "desc": "Download Video Youtube",
+          "path": "/download/ytmp4?url=",
+        },
+        {
+          "name": "Ytmp3",
+          "desc": "Download Audio Youtube",
+          "path": "/download/ytmp3?url=",
         }
       ]
     },
