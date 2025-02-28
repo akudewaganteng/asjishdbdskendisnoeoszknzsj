@@ -49,12 +49,14 @@
         {
           "name": "Cek Status",
           "desc": "Cek status orderkouta",
-          "path": "/orderkuota/cekstatus?apikey=&merchant=&keyorkut="
+          "path": "/orderkuota/cekstatus?apikey=&merchant=&keyorkut=",
+          "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
         },
         {
           "name": "Create Payment",
           "desc": "Membuat pembayaran baru",
           "path": "/orderkuota/createpayment?apikey=&amount=&codeqr="
+         "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
         }
       ]
     },
@@ -65,6 +67,11 @@
           "name": "Blue Archive",
           "desc": "Blue Archive Random Images",
           "path": "/random/ba"
+        }
+        {
+          "name": "Waifu",
+          "desc": "Waifu Random Images",
+          "path": "/random/waifu"
         }
       ]
     },
