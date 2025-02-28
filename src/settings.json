@@ -96,7 +96,7 @@
         {
           "name": "Ytmp4",
           "desc": "Download Video Youtube",
-          "path": "/download/ytmp4?url=",
+          "path": "/download/ytmp4?url="
         },
         {
           "name": "Ytmp3",
