@@ -91,6 +91,21 @@
       ]
     },
     {
+      "name": "Downloader",
+      "items": [
+        {
+          "name": "Ytmp4",
+          "desc": "Download Video Youtube",
+          "path": "/download/ytmp4?url=",
+        },
+        {
+          "name": "Ytmp3",
+          "desc": "Download Audio Youtube",
+          "path": "/download/ytmp3?url="
+        }
+      ]
+    },
+    {
       "name": "Search Tools",
       "items": [
         {
