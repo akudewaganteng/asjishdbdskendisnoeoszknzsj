@@ -57,20 +57,3 @@ module.exports = function (app) {
         }
     });
 };
-
-app.get("/ai/openai-prompt", async (req, res) => {
-    const { prompt, msg } = req.query;
-    if (!prompt || !msg) return res.json({ error: "Isi semua parameter!" });
-
-    try {
-      const spongeee = await groq(msg, prompt);
-      res.json({
-        status: spongeee.status,
-        result: spongeee.respon,
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "An error occurred while fetching data." });
-    }
-  });
-};
