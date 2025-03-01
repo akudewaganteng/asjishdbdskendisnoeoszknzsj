@@ -109,6 +109,11 @@
           "path": "/download/tiktokdl?url="
         },
         {
+          "name": "Instagram",
+          "desc": "Download Video Instagram",
+          "path": "/download/igdl?url="
+        },
+        {
           "name": "Google Drive",
           "desc": "Download Google Drive",
           "path": "/download/gdrive?url="
