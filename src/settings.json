@@ -124,9 +124,24 @@
           "path": "/download/capcut?url="
         },
         {
-          "name": "Painterest Video",
+          "name": "Pinterest Video",
           "desc": "Download Video Pinterest",
           "path": "/download/pindlvid?url="
+        }
+      ]
+    },
+        {
+      "name": "Info",
+      "items": [
+        {
+          "name": "Merdeka News",
+          "desc": "Merdeka News",
+          "path": "/info/merdekanews?q="
+        },
+        {
+          "name": "Info Gempa",
+          "desc": "Info Gempa",
+          "path": "/info/gempa"
         }
       ]
     },
