@@ -130,7 +130,7 @@
         }
       ]
     },
-        {
+     {
       "name": "Info",
       "items": [
         {
@@ -142,6 +142,36 @@
           "name": "Info Gempa",
           "desc": "Info Gempa",
           "path": "/info/gempa"
+        },
+        {
+          "name": "Info Cuaca",
+          "desc": "Info Cuaca",
+          "path": "/info/cuaca?q="
+        },
+        {
+          "name": "Metronews",
+          "desc": "Metro News",
+          "path": "/info/metronews?judul="
+        }
+      ]
+    },
+    {
+      "name": "Islam",
+      "items": [
+        {
+          "name": "Jadwal Sholat",
+          "desc": "Jadwal Sholat",
+          "path": "/muslim/jadwalshalat?kota="
+        },
+        {
+          "name": "Surah",
+          "desc": "Surah 1-144",
+          "path": "/muslim/surah?nomor="
+        },
+        {
+          "name": "Niat Sholat",
+          "desc": "Niat Sholat",
+          "path": "/muslim/niatsholat?shalat="
         }
       ]
     },
