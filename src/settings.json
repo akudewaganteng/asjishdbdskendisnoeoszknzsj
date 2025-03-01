@@ -147,7 +147,7 @@
           "name": "Sfile",
           "desc": "sfile search",
           "path": "/search/sfile?q="
-        }
+        },
         {
           "name": "Happymod",
           "desc": "Happy search",
