@@ -102,6 +102,26 @@
           "name": "Ytmp3",
           "desc": "Download Audio Youtube",
           "path": "/download/ytmp3?url="
+        },
+         {
+          "name": "Tiktok",
+          "desc": "Download Video Tiktok",
+          "path": "/download/tiktokdl?url="
+        },
+        {
+          "name": "Google Drive",
+          "desc": "Download Google Drive",
+          "path": "/download/gdrive?url="
+        },
+          {
+          "name": "Capcut",
+          "desc": "Download Capcut",
+          "path": "/download/capcut?url="
+        },
+        {
+          "name": "Painterest Video",
+          "desc": "Download Video Pinterest",
+          "path": "/download/pindlvid?url="
         }
       ]
     },
@@ -112,6 +132,21 @@
           "name": "YouTube",
           "desc": "Video search",
           "path": "/search/youtube?q="
+        },
+        {
+          "name": "Tiktok",
+          "desc": "Video search",
+          "path": "/search/tiktoksearch?q="
+        },
+        {
+          "name": "Sfile",
+          "desc": "sfile search",
+          "path": "/search/sfile?q="
+        }
+        {
+          "name": "Happymod",
+          "desc": "Happy search",
+          "path": "/search/happymod?q="
         }
       ]
     }
