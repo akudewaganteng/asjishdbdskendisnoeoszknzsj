@@ -1,0 +1,204 @@
+{
+  "name": "Otaku Api's",
+  "version": "Otaku",
+  "description": "Simple and Easy-to-Use API Documentation",
+  "header": {
+    "status": "Online!",
+    "imageSrc": [
+      "https://media4.giphy.com/media/MdLFOyVZtoUPm/giphy.gif?cid=6c09b952m51lme73oyoabmjw3qwy0vutsidg5o4q7yd2693q&ep=v1_internal_gif_by_id&rid=giphy.gif&ct=g"
+    ],
+    "imageSize": {
+      "mobile": "80%",
+      "tablet": "40%",
+      "desktop": "40%"
+    }
+  },
+  "apiSettings": {
+    "creator": "AppoloLonely---"
+  },
+  "links": [
+    {
+      "name": "Source Code",
+      "url": "https://github.com/rynxzyy/Rynn-UI"
+    },
+    {
+      "name": "Telegram Channel",
+      "url": "https://t.me/lahngcok"
+    },
+    {
+      "name": "Contact Me",
+      "url": "https://t.me/tearsinsilencee"
+    }
+  ],
+  "categories": [
+    {
+      "name": "AI (Artificial Intelligence)",
+      "items": [
+        {
+          "name": "LuminAI",
+          "desc": "Talk with luminai",
+          "path": "/ai/luminai?text="
+        },
+        {
+          "name": "HydroMind",
+          "desc": "Talk with hydromind",
+          "path": "/ai/hydromind?text=&model=",
+          "innerDesc": "See the list of supported AI models here: https://mind.hydrooo.web.id"
+        },
+        {
+          "name": "OpenAi",
+          "desc": "Talk with OpenAi",
+          "path": "/ai/openai?msg="
+        },
+       {
+          "name": "OpenAi Prompt",
+          "desc": "Open Ai With Prompt",
+          "path": "/ai/openai-prompt?prompt=&msg=",
+          "innerDesc": "Open Ai that uses prompts and text"
+        }
+      ]
+    },
+        {
+      "name": "Orderkouta Gateaway",
+      "items": [
+        {
+          "name": "Cek Status",
+          "desc": "Cek status orderkouta",
+          "path": "/orderkuota/cekstatus?apikey=&merchant=&keyorkut=",
+          "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
+        },
+        {
+          "name": "Create Payment",
+          "desc": "Membuat pembayaran baru",
+          "path": "/orderkuota/createpayment?apikey=&amount=&codeqr=",
+         "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
+        }
+      ]
+    },
+    {
+      "name": "Random",
+      "items": [
+        {
+          "name": "Blue Archive",
+          "desc": "Blue Archive Random Images",
+          "path": "/random/ba"
+        },
+        {
+          "name": "Waifu",
+          "desc": "Waifu Random Images",
+          "path": "/random/waifu"
+        }
+      ]
+    },
+    {
+      "name": "Downloader",
+      "items": [
+        {
+          "name": "Ytmp4",
+          "desc": "Download Video Youtube",
+          "path": "/download/ytmp4?url="
+        },
+        {
+          "name": "Ytmp3",
+          "desc": "Download Audio Youtube",
+          "path": "/download/ytmp3?url="
+        },
+         {
+          "name": "Tiktok",
+          "desc": "Download Video Tiktok",
+          "path": "/download/tiktokdl?url="
+        },
+        {
+          "name": "Instagram",
+          "desc": "Download Video Instagram",
+          "path": "/download/igdl?url="
+        },
+        {
+          "name": "Google Drive",
+          "desc": "Download Google Drive",
+          "path": "/download/gdrive?url="
+        },
+          {
+          "name": "Capcut",
+          "desc": "Download Capcut",
+          "path": "/download/capcut?url="
+        },
+        {
+          "name": "Pinterest Video",
+          "desc": "Download Video Pinterest",
+          "path": "/download/pindlvid?url="
+        }
+      ]
+    },
+     {
+      "name": "Info",
+      "items": [
+        {
+          "name": "Merdeka News",
+          "desc": "Merdeka News",
+          "path": "/info/merdekanews?q="
+        },
+        {
+          "name": "Info Gempa",
+          "desc": "Info Gempa",
+          "path": "/info/gempa"
+        },
+        {
+          "name": "Info Cuaca",
+          "desc": "Info Cuaca",
+          "path": "/info/cuaca?q="
+        },
+        {
+          "name": "Metronews",
+          "desc": "Metro News",
+          "path": "/info/metronews?judul="
+        }
+      ]
+    },
+    {
+      "name": "Islam",
+      "items": [
+        {
+          "name": "Jadwal Sholat",
+          "desc": "Jadwal Sholat",
+          "path": "/muslim/jadwalshalat?kota="
+        },
+        {
+          "name": "Surah",
+          "desc": "Surah 1-144",
+          "path": "/muslim/surah?nomor="
+        },
+        {
+          "name": "Niat Sholat",
+          "desc": "Niat Sholat",
+          "path": "/muslim/niatsholat?shalat="
+        }
+      ]
+    },
+    {
+      "name": "Search Tools",
+      "items": [
+        {
+          "name": "YouTube",
+          "desc": "Video search",
+          "path": "/search/youtube?q="
+        },
+        {
+          "name": "Tiktok",
+          "desc": "Video search",
+          "path": "/search/tiktoksearch?q="
+        },
+        {
+          "name": "Sfile",
+          "desc": "sfile search",
+          "path": "/search/sfile?q="
+        },
+        {
+          "name": "Happymod",
+          "desc": "Happy search",
+          "path": "/search/happymod?q="
+        }
+      ]
+    }
+  ]
+}
