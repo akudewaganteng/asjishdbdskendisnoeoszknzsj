@@ -43,7 +43,7 @@ module.exports = function (app) {
     }
   }
 
-  app.get('/api/obfuscated', async (req, res) => { 
+  app.get('/api/obfuscatedgcorcil', async (req, res) => { 
     const { apikey, code } = req.query;
 
     if (!apikey) return res.json("Isi Parameter Apikey.");
