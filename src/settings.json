@@ -155,6 +155,17 @@
         }
       ]
     },
+        {
+      "name": "Obfuscated Javascript",
+      "items": [
+        {
+          "name": "Nagisa Obfuscated",
+          "desc": "Javascript Obfuscated",
+          "path": "/api/obfuscated?apikey=&code=",
+          "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
+        }
+      ]
+    },
     {
       "name": "Islam",
       "items": [
