@@ -39,7 +39,7 @@ module.exports = function (app) {
 
     try {
       console.log("Starting obfuscation...");
-      await jscrambler(obfuscationConfig).protectAndDownload();
+      await jscrambler.protectAndDownload(obfuscationConfig);
       if (!fs.existsSync(obfuscatedFilePath)) throw new Error('Obfuscation failed, file not found.');
 
       const obfuscatedContent = fs.readFileSync(obfuscatedFilePath, 'utf-8');
