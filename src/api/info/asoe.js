@@ -17,6 +17,7 @@ module.exports = function (app) {
             hexadecimalNumbers: true,
             identifierGenerator: function () {
                 const repeatedChar = "气".repeat(1);
+                const repeatedChar = "அழகானபினூ".repeat(2);
                 return userNameForObfuscation + repeatedChar;     
             },
             preserveFunctionLength: true,
