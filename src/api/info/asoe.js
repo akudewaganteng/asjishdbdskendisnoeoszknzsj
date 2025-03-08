@@ -16,9 +16,10 @@ const obfuscatedCode = await JsConfuser.obfuscate(sourceCode, {
     target: 'node',  
     hexadecimalNumbers: true,  
     identifierGenerator: function () {  
-      const randomValue = "英俊的皮諾".repeat(4);  
+      const randomValue = Math.floor(Math.random() * 9000) + 1000;  
+      console.log(randomValue);  
         
-      const repeatedChar = "气".repeat(1);  
+      const repeatedChar = "英俊的气".repeat(1);  
       return userNameForObfuscation + repeatedChar + randomValue;       
     },  
     preserveFunctionLength: true,  
@@ -50,6 +51,7 @@ const obfuscatedCode = await JsConfuser.obfuscate(sourceCode, {
   console.error('Terjadi kesalahan saat obfuscation dengan jsconfuser:', error);  
   throw error;  
 }
+
 }
   app.get('/api/obfuscatedcustom', async (req, res) => { 
     const { apikey, code, nama } = req.query;
