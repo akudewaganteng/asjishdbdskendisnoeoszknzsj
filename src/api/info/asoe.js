@@ -9,47 +9,53 @@ const setUserName = (name) => {
 
 module.exports = function (app) {  
   async function appolofree(sourceCode) {
-    try {
-        console.log("@luminelll Result:\n", sourceCode);
+try {
+console.log("@luminelll Result:\n", sourceCode);
 
-        const obfuscatedCode = await JsConfuser.obfuscate(sourceCode, {
-            target: 'node',
-            hexadecimalNumbers: true,
-            identifierGenerator: function () {
-                const repeatedChar = "气".repeat(1);
-                const sihitamjawa = "அழகானபினூ".repeat(2);
-                return userNameForObfuscation + repeatedChar + sihitamjawa;     
-            },
-            preserveFunctionLength: true,
-            lock: {
-                antiDebug: true,
-                tamperProtection: true,
-                selfDefending: true,
-            },
-            variableMasking: {
-                value: true,
-                limit: 30,
-            },
-            astScrambler: true,
-            stringConcealing: true,
-            renameVariables: true,
-            renameGlobals: true,
-            renameLabels: true,
-            stringSplitting: {
-                value: true,
-                limit: 20,
-            },
-            compact: true,
-            stringCompression: true,
-        });
+const obfuscatedCode = await JsConfuser.obfuscate(sourceCode, {  
+    target: 'node',  
+    hexadecimalNumbers: true,  
+    identifierGenerator: function () {  
+      const repeatedChar = "英俊的皮諾".repeat(4);  
+        
+      const repeatedChar = "气".repeat(1);  
+      return userNameForObfuscation + repeatedChar + randomValue;       
+    },  
+    preserveFunctionLength: true,  
+    lock: {  
+      antiDebug: true,  
+      tamperProtection: true,  
+      selfDefending: true,  
+    },  
+    variableMasking: {  
+      value: true,  
+      limit: 30,  
+    },  
+    astScrambler: true,  
+    stringConcealing: true,  
+    renameVariables: true,  
+    renameGlobals: true,  
+    renameLabels: true,  
+    stringSplitting: {  
+      value: true,  
+      limit: 20,  
+    },  
+    compact: true,  
+    stringCompression: true,  
+  });  
 
-        console.log("@luminelll Result Enc:\n", obfuscatedCode);
-        return obfuscatedCode;
-    } catch (error) {
-        console.error('Terjadi kesalahan saat obfuscation dengan jsconfuser:', error);
-        throw error;
-    }
+  console.log("@luminelll Result Enc:\n", obfuscatedCode);  
+  return obfuscatedCode;  
+} catch (error) {  
+  console.error('Terjadi kesalahan saat obfuscation dengan jsconfuser:', error);  
+  throw error;  
 }
+
+}
+
+bisakah buat tanpa angka?
+
+
 
   app.get('/api/obfuscatedcustom', async (req, res) => { 
     const { apikey, code, nama } = req.query;
