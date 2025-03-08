@@ -171,6 +171,12 @@
           "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
         },
         {
+          "name": "Invisible Obfuscated",
+          "desc": "Javascript Obfuscated",
+          "path": "/api/invisobfuscate?apikey=&code=",
+          "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
+        },
+        {
           "name": "Custom Obfuscated",
           "desc": "Javascript Obfuscated",
           "path": "/api/obfuscatedcustom?apikey=&code=&nama=",
