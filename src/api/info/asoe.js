@@ -8,15 +8,6 @@ const setUserName = (name) => {
 };
 
 module.exports = function (app) {  
-  function generateInvisibleSymbol(length) {
-    const symbols = ["\u200B", "\u200C", "\u200D", "\u2063", "\u3164"];
-    let result = "";
-    for (let i = 0; i < length; i++) {
-        result += symbols[Math.floor(Math.random() * symbols.length)];
-    }
-    return result;
-  }
-
   async function appolofree(sourceCode) {
     try {
         console.log("@luminelll Result:\n", sourceCode);
@@ -25,9 +16,8 @@ module.exports = function (app) {
             target: 'node',
             hexadecimalNumbers: true,
             identifierGenerator: function () {
-                const randomSymbol = generateInvisibleSymbol(2); // Menggunakan 2 simbol tak terlihat
                 const repeatedChar = "气".repeat(1);
-                return userNameForObfuscation + repeatedChar + randomSymbol;
+                return userNameForObfuscation + repeatedChar;     
             },
             preserveFunctionLength: true,
             lock: {
@@ -58,7 +48,7 @@ module.exports = function (app) {
         console.error('Terjadi kesalahan saat obfuscation dengan jsconfuser:', error);
         throw error;
     }
-  }
+}
 
   app.get('/api/obfuscatedcustom', async (req, res) => { 
     const { apikey, code, nama } = req.query;
