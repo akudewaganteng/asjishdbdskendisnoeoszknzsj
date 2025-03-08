@@ -181,6 +181,12 @@
           "desc": "Javascript Obfuscated",
           "path": "/api/obfuscatedcustom?apikey=&code=&nama=",
           "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
+        },
+        {
+          "name": "Jscrambler Obfuscated",
+          "desc": "Javascript Obfuscated",
+          "path": "/api/jscramblerobfuscated?apikey=&accessKey=&secretKey=&applicationId=&code=&date=",
+          "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
         }
       ]
     },
