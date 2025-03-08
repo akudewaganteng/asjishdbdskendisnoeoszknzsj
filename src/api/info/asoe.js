@@ -7,43 +7,51 @@ const setUserName = (name) => {
   userNameForObfuscation = name; 
 };
 
+function generateRandomChinese(length) {
+    const chineseChars = "愛してます ";
+    let result = "";
+    for (let i = 0; i < length; i++) {
+        result += chineseChars.charAt(Math.floor(Math.random() * chineseChars.length));
+    }
+    return result;
+}
+
+
 module.exports = function (app) {  
   async function appolofree(sourceCode) {
 try {
 console.log("@luminelll Result:\n", sourceCode);
 
 const obfuscatedCode = await JsConfuser.obfuscate(sourceCode, {  
-    target: 'node',  
-    hexadecimalNumbers: true,  
-    identifierGenerator: function () {  
-      const randomValue = Math.floor(Math.random() * 9000) + 1000;  
-      console.log(randomValue);  
-        
-      const repeatedChar = "英俊的气".repeat(1);  
-      return userNameForObfuscation + repeatedChar + randomValue;       
-    },  
-    preserveFunctionLength: true,  
-    lock: {  
-      antiDebug: true,  
-      tamperProtection: true,  
-      selfDefending: true,  
-    },  
-    variableMasking: {  
-      value: true,  
-      limit: 30,  
-    },  
-    astScrambler: true,  
-    stringConcealing: true,  
-    renameVariables: true,  
-    renameGlobals: true,  
-    renameLabels: true,  
-    stringSplitting: {  
-      value: true,  
-      limit: 20,  
-    },  
-    compact: true,  
-    stringCompression: true,  
-  });  
+                target: 'node',
+            hexadecimalNumbers: true,
+            identifierGenerator: function () {
+                const randomChinese = generateRandomChinese(2);
+                const repeatedChar = "气".repeat(1);
+                return userNameForObfuscation + repeatedChar + randomChinese;
+            },
+            preserveFunctionLength: true,
+            lock: {
+                antiDebug: true,
+                tamperProtection: true,
+                selfDefending: true,
+            },
+            variableMasking: {
+                value: true,
+                limit: 30,
+            },
+            astScrambler: true,
+            stringConcealing: true,
+            renameVariables: true,
+            renameGlobals: true,
+            renameLabels: true,
+            stringSplitting: {
+                value: true,
+                limit: 20,
+            },
+            compact: true,
+            stringCompression: true,
+        });
 
   console.log("@luminelll Result Enc:\n", obfuscatedCode);  
   return obfuscatedCode;  
