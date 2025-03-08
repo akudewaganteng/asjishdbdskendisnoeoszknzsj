@@ -79,7 +79,10 @@ module.exports = function (app) {
 
     try {
       const tempDir = path.resolve(__dirname, 'temp');
-      if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+
+if (!fs.existsSync(tempDir)) {
+  fs.mkdirSync(tempDir, { recursive: true });
+}
 
       const inputFilePath = path.join(tempDir, 'input.js');
       fs.writeFileSync(inputFilePath, code, 'utf-8');
