@@ -1,10 +1,9 @@
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+const jscrambler = require('jscrambler').default;
+const settings = require('../settings');
 module.exports = function (app) {
-  const fs = require('fs');
-  const path = require('path');
-  const os = require('os');
-  const jscrambler = require('jscrambler').default;
-  const settings = require('../settings');
-
   const getCurrentDate = () => new Date().toISOString().split('T')[0].replace(/-/g, '/');
   const getEndDate = (startDate, days) => {
     const start = new Date(startDate);
