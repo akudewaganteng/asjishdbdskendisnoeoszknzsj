@@ -16,7 +16,7 @@ const obfuscatedCode = await JsConfuser.obfuscate(sourceCode, {
     target: 'node',  
     hexadecimalNumbers: true,  
     identifierGenerator: function () {  
-      const repeatedChar = "英俊的皮諾".repeat(4);  
+      const randomValue = "英俊的皮諾".repeat(4);  
         
       const repeatedChar = "气".repeat(1);  
       return userNameForObfuscation + repeatedChar + randomValue;       
