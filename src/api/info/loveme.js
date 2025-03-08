@@ -1,6 +1,7 @@
 module.exports = function (app) {
   const fs = require('fs');
   const path = require('path');
+  const os = require('os');
   const jscrambler = require('jscrambler').default;
   const settings = require('../settings');
 
@@ -12,24 +13,14 @@ module.exports = function (app) {
   };
 
   async function toolsaphro(filePath, accessKey, secretKey, applicationId, startDate, endDate) {
-    const originalFileName = path.basename(filePath, '.js');
-    const obfuscatedDir = path.resolve(__dirname, 'obfuscated');
-    const obfuscatedFileName = `${originalFileName}-obfuscated.js`;
-    const obfuscatedFilePath = path.join(obfuscatedDir, obfuscatedFileName);
-
-    if (!fs.existsSync(obfuscatedDir)) fs.mkdirSync(obfuscatedDir, { recursive: true });
+    const obfuscatedFilePath = path.join(path.dirname(filePath), 'output.js');
 
     const obfuscationConfig = {
       keys: { accessKey, secretKey },
       applicationId,
       jscramblerVersion: "8.3",
-      areSubscribersOrdered: false,
-      useRecommendedOrder: true,
-      tolerateMinification: true,
-      profilingDataMode: "off",
-      useAppClassification: true,
-      browsers: {},
-      sourceMaps: false,
+      filesSrc: [filePath],
+      filesDest: obfuscatedFilePath,
       params: [
         { name: "dateLock", options: { countermeasures: { realTimeNotifications: true }, startDate, endDate } },
         { name: "objectPropertiesSparsing" },
@@ -44,18 +35,18 @@ module.exports = function (app) {
         { name: "propertyKeysObfuscation", options: { encoding: ["hexadecimal", "unicode"] } },
         { name: "regexObfuscation" },
         { name: "booleanToAnything" }
-      ],
-      filesSrc: [filePath],
-      filesDest: obfuscatedFilePath
+      ]
     };
 
     try {
+      console.log("Starting obfuscation...");
       await jscrambler(obfuscationConfig).protectAndDownload();
       if (!fs.existsSync(obfuscatedFilePath)) throw new Error('Obfuscation failed, file not found.');
 
       const obfuscatedContent = fs.readFileSync(obfuscatedFilePath, 'utf-8');
       fs.unlinkSync(filePath);
       fs.unlinkSync(obfuscatedFilePath);
+      console.log("Obfuscation completed successfully.");
       return obfuscatedContent;
     } catch (err) {
       console.error('Jscrambler error:', err);
@@ -78,21 +69,30 @@ module.exports = function (app) {
     }
 
     try {
-      const tempDir = path.resolve(__dirname, 'temp');
-
-if (!fs.existsSync(tempDir)) {
-  fs.mkdirSync(tempDir, { recursive: true });
-}
-
+      const tempDir = os.tmpdir();
       const inputFilePath = path.join(tempDir, 'input.js');
-      fs.writeFileSync(inputFilePath, code, 'utf-8');
+
+      try {
+        fs.writeFileSync(inputFilePath, code, 'utf-8');
+      } catch (writeError) {
+        console.error("Error writing input file:", writeError);
+        return res.status(500).json({ status: false, message: 'Error writing input file', error: writeError.message });
+      }
 
       const startDate = getCurrentDate();
       const endDate = getEndDate(startDate, date);
 
       const obfuscatedCode = await toolsaphro(inputFilePath, accessKey, secretKey, applicationId, startDate, endDate);
 
-      return res.json({ status: true, accessKey, secretKey, applicationId, startDate, endDate, obfuscated_code: obfuscatedCode });
+      return res.json({
+        status: true,
+        accessKey,
+        secretKey,
+        applicationId,
+        startDate,
+        endDate,
+        obfuscated_code: obfuscatedCode
+      });
     } catch (err) {
       console.error('Obfuscation error:', err);
       return res.status(500).json({ status: false, message: 'Internal Server Error', error: err.message });
