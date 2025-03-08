@@ -50,13 +50,7 @@ const obfuscatedCode = await JsConfuser.obfuscate(sourceCode, {
   console.error('Terjadi kesalahan saat obfuscation dengan jsconfuser:', error);  
   throw error;  
 }
-
 }
-
-bisakah buat tanpa angka?
-
-
-
   app.get('/api/obfuscatedcustom', async (req, res) => { 
     const { apikey, code, nama } = req.query;
 
