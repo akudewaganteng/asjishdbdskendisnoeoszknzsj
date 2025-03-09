@@ -98,7 +98,7 @@ app.get('/api/obfuscatedcustomv2', async (req, res) => {
     }
 
     try {
-        await setUserName(nama);
+        setUserName(nama); // Tidak perlu pakai `await` karena bukan fungsi async
 
         const tempDir = "/tmp";
         const inputPath = path.join(tempDir, 'input.js');
