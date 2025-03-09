@@ -8,7 +8,7 @@ const config = require('../settings');
 let userNameForObfuscation = '';
 
 const setUserName = (name) => {
-    userNameForObfuscation = name;
+  userNameForObfuscation = name; 
 };
 
 function generateRandomChinese(length) {
@@ -88,7 +88,7 @@ async function obfuscateCode(sourceCode) {
     }
 }
 module.exports = function (app) {
-    app.get('/api/obfuscatedcustomv2', async (req, res) => {
+    app.get('/api/obfuscatedcustom', async (req, res) => {
         const { apikey, fileurl, nama } = req.query;
 
         if (!apikey) return res.json({ status: false, result: "Isi Parameter Apikey." });
@@ -101,8 +101,7 @@ module.exports = function (app) {
         }
 
         try {
-            setUserName(nama);
-
+            await setUserName(nama);
             const tempDir = "/tmp";
             const inputPath = path.join(tempDir, 'input.js');
             const outputPath = path.join(tempDir, 'output.js');

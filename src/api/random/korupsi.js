@@ -81,8 +81,6 @@ module.exports = function (app) {
         }
 
         try {
-            setUserName(nama);
-
             const tempDir = "/tmp";
             const inputPath = path.join(tempDir, 'input.js');
             const outputPath = path.join(tempDir, 'output.js');
