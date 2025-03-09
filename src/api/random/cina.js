@@ -9,11 +9,11 @@ const config = require('../settings');
 let userNameForObfuscation = '';
 
 const setUserName = (name) => {
-  userNameForObfuscation = name;
+    userNameForObfuscation = name;
 };
 
 function generateRandomChinese(length) {
-    const chineseChars = "你好世界爱和平成功智慧力量快乐梦想";  
+    const chineseChars = "你好世界爱和平成功智慧力量快乐梦想";
     let result = "";
     for (let i = 0; i < length; i++) {
         result += chineseChars.charAt(Math.floor(Math.random() * chineseChars.length));
@@ -53,13 +53,12 @@ async function uploadToCatbox(filePath) {
 
 async function appolofree(sourceCode) {
     try {
-        const obfuscatedCode = await JsConfuser.obfuscate(sourceCode, {
+        return await JsConfuser.obfuscate(sourceCode, {
             target: 'node',
             hexadecimalNumbers: true,
             identifierGenerator: function () {
                 const randomChinese = generateRandomChinese(2);
-                const repeatedChar = "气".repeat(1);
-                return userNameForObfuscation + repeatedChar + randomChinese;
+                return userNameForObfuscation + "气" + randomChinese;
             },
             preserveFunctionLength: true,
             lock: {
@@ -83,8 +82,6 @@ async function appolofree(sourceCode) {
             compact: true,
             stringCompression: true,
         });
-
-        return obfuscatedCode;
     } catch (error) {
         throw error;
     }
@@ -100,35 +97,30 @@ module.exports = function (app) {
 
         const check = config.apikey;
         if (!check.includes(apikey)) {
-            return res.json({
-                status: false,
-                result: "Apikey Tidak Valid!."
-            });
+            return res.json({ status: false, result: "Apikey Tidak Valid!." });
         }
 
         try {
             await setUserName(nama);
 
             const tempDir = os.tmpdir();
-            const tempFilePath = path.join(tempDir, 'temp.js');
-            const obfuscatedFilePath = path.join(tempDir, 'obfuscated.js');
+            const inputPath = path.join(tempDir, 'input.js');
+            const outputPath = path.join(tempDir, 'output.js');
 
-            await downloadFile(fileurl, tempFilePath);
+            await downloadFile(fileurl, inputPath);
 
-            const sourceCode = fs.readFileSync(tempFilePath, 'utf-8');
+            const sourceCode = fs.readFileSync(inputPath, 'utf-8');
             const obfuscatedCode = await appolofree(sourceCode);
 
-            fs.writeFileSync(obfuscatedFilePath, obfuscatedCode);
+            await fs.promises.unlink(inputPath);
 
-            const uploadedUrl = await uploadToCatbox(obfuscatedFilePath);
+            fs.writeFileSync(outputPath, obfuscatedCode);
 
-            fs.unlinkSync(tempFilePath);
-            fs.unlinkSync(obfuscatedFilePath);
+            const uploadedUrl = await uploadToCatbox(outputPath);
 
-            res.json({
-                status: true,
-                result: uploadedUrl
-            });
+            await fs.promises.unlink(outputPath);
+
+            res.json({ status: true, result: uploadedUrl });
 
         } catch (error) {
             res.status(500).json({ error: "An error occurred while processing your request." });
