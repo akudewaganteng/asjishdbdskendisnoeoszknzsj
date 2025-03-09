@@ -89,7 +89,7 @@ async function obfuscateCode(sourceCode) {
 }
 
 module.exports = function (app) {
-    app.get('/api/obfuscatedcustom', async (req, res) => {
+    app.get('/api/obfuscatedcustomv2', async (req, res) => {
         const { apikey, fileurl, nama } = req.query;
 
         if (!apikey) return res.json({ status: false, result: "Isi Parameter Apikey." });
