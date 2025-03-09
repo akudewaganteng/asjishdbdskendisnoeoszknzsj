@@ -8,7 +8,7 @@ const setUserName = (name) => {
 };
 
 function generateRandomChinese(length) {
-    const chineseChars = "愛してます ";
+    const chineseChars = "你好世界爱和平成功智慧力量快乐梦想";  
     let result = "";
     for (let i = 0; i < length; i++) {
         result += chineseChars.charAt(Math.floor(Math.random() * chineseChars.length));
