@@ -83,7 +83,8 @@ async function obfuscateCode(sourceCode) {
         console.log("Obfuscation completed successfully.");
 
         if (typeof obfuscatedCode !== 'string') {
-            throw new Error("Obfuscation did not return a string");
+            console.warn("Obfuscation output is not a string, converting to string...");
+            obfuscatedCode = String(obfuscatedCode);
         }
 
         return obfuscatedCode;
