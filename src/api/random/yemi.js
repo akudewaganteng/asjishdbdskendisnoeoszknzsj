@@ -73,37 +73,38 @@ async function obfuscateCode(sourceCode) {
 }
 module.exports = function (app) {
     app.get('/api/obfuscatedgcorcil', async (req, res) => {
-    const { apikey, fileurl } = req.query;
+        const { apikey, fileurl, nama } = req.query;
 
-    if (!apikey) return res.json({ status: false, result: "Isi Parameter Apikey." });
-    if (!fileurl) return res.json({ status: false, result: "Isi Parameter File URL." });
-    
-    const check = config.apikey;
-    if (!check.includes(apikey)) {
-        return res.json({ status: false, result: "Apikey Tidak Valid!." });
-    }
+        if (!apikey) return res.json({ status: false, result: "Isi Parameter Apikey." });
+        if (!fileurl) return res.json({ status: false, result: "Isi Parameter File URL." });
+        const check = config.apikey;
+        if (!check.includes(apikey)) {
+            return res.json({ status: false, result: "Apikey Tidak Valid!." });
+        }
 
-    try {
-        const tempDir = "/tmp";
-        const inputPath = path.join(tempDir, 'input.js');
-        const outputPath = path.join(tempDir, 'output.js');
+        try {
+            const tempDir = "/tmp";
+            const inputPath = path.join(tempDir, 'input.js');
+            const outputPath = path.join(tempDir, 'output.js');
 
-        await downloadFile(fileurl, inputPath);
-        
-        const sourceCode = fs.readFileSync(inputPath, 'utf-8');
-        const obfuscatedCode = await obfuscateCode(sourceCode);
+            await downloadFile(fileurl, inputPath);
+            
+            const sourceCode = fs.readFileSync(inputPath, 'utf-8');
+  
+            const obfuscatedCode = await obfuscateCode(sourceCode);
 
-        fs.writeFileSync(outputPath, obfuscatedCode);
-       
-        const uploadedUrl = await uploadToCatbox(outputPath);
-                    
-        await fs.promises.unlink(inputPath);
-        await fs.promises.unlink(outputPath);
+            fs.writeFileSync(outputPath, obfuscatedCode);
+           
+            const uploadedUrl = await uploadToCatbox(outputPath);
+                        
+            await fs.promises.unlink(inputPath);
+            await fs.promises.unlink(outputPath);
 
-        res.json({ status: true, result: uploadedUrl });
+            res.json({ status: true, result: uploadedUrl });
 
-    } catch (error) {
-        console.error("Error in /api/obfuscatedgcorcil:", error);
-        res.status(500).json({ error: "An error occurred while processing your request.", details: error.message });
-    }
-});
+        } catch (error) {
+            console.error("Error in /api/obfuscatedcustom:", error);
+            res.status(500).json({ error: "An error occurred while processing your request.", details: error.message });
+        }
+    });
+};
