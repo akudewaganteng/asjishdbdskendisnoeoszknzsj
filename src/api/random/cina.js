@@ -119,8 +119,11 @@ async function appolofree(sourceCode) {
 
             res.json({ status: true, result: uploadedUrl });
 
-        } catch (error) {
-            res.status(500).json({ error: "An error occurred while processing your request." });
-        }
+} catch (error) {
+    console.error("Error:", error); // Log error ke console
+    res.status(500).json({
+        status: false,
+        error: error.message || "An error occurred while processing your request.",
+        stack: error.stack || "No stack trace available"
     });
-};
+}
