@@ -49,8 +49,44 @@ async function uploadToCatbox(filePath) {
 async function obfuscateCode(sourceCode) {
     try {
         console.log("Starting obfuscation...");
+        console.log("Source Code Input:");
+        console.log(sourceCode);
 
-        const obfuscatedCode = await JsConfuser.obfuscate(sourceCode, {
+        console.log("Obfuscation Configuration:");
+        console.log({
+            target: 'node',
+            hexadecimalNumbers: true,
+            identifierGenerator: function () {
+                const randomChinese = generateRandomChinese(2);
+                return userNameForObfuscation + "气" + randomChinese;
+            },
+            preserveFunctionLength: true,
+            lock: {
+                antiDebug: true,
+                tamperProtection: true,
+                selfDefending: true,
+            },
+            variableMasking: {
+                value: true,
+                limit: 30,
+            },
+            astScrambler: true,
+            stringConcealing: true,
+            renameVariables: true,
+            renameGlobals: true,
+            renameLabels: true,
+            stringSplitting: {
+                value: true,
+                limit: 20,
+            },
+            compact: true,
+            stringCompression: true,
+        });
+
+        // Pastikan tidak ada nilai konstanta yang berubah
+        console.log("Before Obfuscation...");
+        
+        let obfuscatedCode = await JsConfuser.obfuscate(sourceCode, {
             target: 'node',
             hexadecimalNumbers: true,
             identifierGenerator: function () {
@@ -81,10 +117,14 @@ async function obfuscateCode(sourceCode) {
         });
 
         console.log("Obfuscation completed successfully.");
+        console.log("Obfuscated Code Output:");
+        console.log(obfuscatedCode);
 
         if (typeof obfuscatedCode !== 'string') {
             console.warn("Obfuscation output is not a string, converting to string...");
-            obfuscatedCode = String(obfuscatedCode);
+            obfuscatedCode = JSON.stringify(obfuscatedCode);
+            console.log("Converted Obfuscated Code Output:");
+            console.log(obfuscatedCode);
         }
 
         return obfuscatedCode;
