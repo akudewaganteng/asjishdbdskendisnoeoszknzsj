@@ -1,7 +1,6 @@
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
-const os = require('os');
 const FormData = require('form-data');
 const JsConfuser = require('js-confuser');
 const config = require('../settings');
@@ -11,7 +10,7 @@ let userNameForObfuscation = '';
 const setUserName = (name) => {
     userNameForObfuscation = name;
 };
-module.exports = function (app) {
+
 function generateRandomChinese(length) {
     const chineseChars = "你好世界爱和平成功智慧力量快乐梦想";
     let result = "";
@@ -22,10 +21,9 @@ function generateRandomChinese(length) {
 }
 
 async function downloadFile(url, outputPath) {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`Failed to download file: ${response.statusText}`);
-    const buffer = await response.arrayBuffer();
-    await fs.promises.writeFile(outputPath, Buffer.from(buffer));
+    const response = await axios.get(url, { responseType: 'arraybuffer' });
+    fs.writeFileSync(outputPath, response.data);
+    console.log("File downloaded successfully:", outputPath);
 }
 
 async function uploadToCatbox(filePath) {
@@ -40,8 +38,7 @@ async function uploadToCatbox(filePath) {
             }
         });
 
-        console.log("Catbox Response:", response.data); // Tambahkan log ini
-
+        console.log("Catbox Upload Response:", response.data);
         return response.data;
     } catch (error) {
         console.error("Catbox Upload Error:", error.response ? error.response.data : error);
@@ -49,9 +46,11 @@ async function uploadToCatbox(filePath) {
     }
 }
 
-async function appolofree(sourceCode) {
+async function obfuscateCode(sourceCode) {
     try {
-        return await JsConfuser.obfuscate(sourceCode, {
+        console.log("Starting obfuscation...");
+
+        const obfuscatedCode = await JsConfuser.obfuscate(sourceCode, {
             target: 'node',
             hexadecimalNumbers: true,
             identifierGenerator: function () {
@@ -80,58 +79,61 @@ async function appolofree(sourceCode) {
             compact: true,
             stringCompression: true,
         });
+
+        console.log("Obfuscation completed successfully.");
+        return obfuscatedCode;
     } catch (error) {
+        console.error("Error during obfuscation:", error);
         throw error;
     }
 }
 
-app.get('/api/obfuscatedcustomv2', async (req, res) => {
-    const { apikey, fileurl, nama } = req.query;
+module.exports = function (app) {
+    app.get('/api/obfuscatedcustom', async (req, res) => {
+        const { apikey, fileurl, nama } = req.query;
 
-    if (!apikey) return res.json({ status: false, result: "Isi Parameter Apikey." });
-    if (!fileurl) return res.json({ status: false, result: "Isi Parameter fileurl." });
-    if (!nama) return res.json({ status: false, result: "Isi Parameter Nama." });
+        if (!apikey) return res.json({ status: false, result: "Isi Parameter Apikey." });
+        if (!fileurl) return res.json({ status: false, result: "Isi Parameter File URL." });
+        if (!nama) return res.json({ status: false, result: "Isi Parameter Nama." });
 
-    const check = config.apikey;
-    if (!check.includes(apikey)) {
-        return res.json({ status: false, result: "Apikey Tidak Valid!." });
-    }
+        const check = config.apikey;
+        if (!check.includes(apikey)) {
+            return res.json({ status: false, result: "Apikey Tidak Valid!." });
+        }
 
-    try {
-        setUserName(nama); // Tidak perlu pakai `await` karena bukan fungsi async
+        try {
+            setUserName(nama);
 
-        const tempDir = "/tmp";
-        const inputPath = path.join(tempDir, 'input.js');
-        const outputPath = path.join(tempDir, 'output.js');
+            const tempDir = "/tmp";
+            const inputPath = path.join(tempDir, 'input.js');
+            const outputPath = path.join(tempDir, 'output.js');
 
-        console.log("Downloading file from:", fileurl);
-        await downloadFile(fileurl, inputPath);
-        console.log("File downloaded successfully:", inputPath);
+            console.log("Downloading file from:", fileurl);
+            await downloadFile(fileurl, inputPath);
+            
+            const sourceCode = fs.readFileSync(inputPath, 'utf-8');
+            console.log("File read successfully, length:", sourceCode.length);
 
-        const sourceCode = fs.readFileSync(inputPath, 'utf-8');
-        console.log("File read successfully, length:", sourceCode.length);
+            console.log("Starting obfuscation...");
+            const obfuscatedCode = await obfuscateCode(sourceCode);
+            console.log("Obfuscation completed successfully.");
 
-        console.log("Starting obfuscation...");
-        const obfuscatedCode = await appolofree(sourceCode);
-        console.log("Obfuscation completed successfully.");
+            fs.writeFileSync(outputPath, obfuscatedCode);
+            console.log("Obfuscated file saved:", outputPath);
 
-        await fs.promises.unlink(inputPath);
-        console.log("Deleted input file:", inputPath);
+            console.log("Uploading obfuscated file to Catbox...");
+            const uploadedUrl = await uploadToCatbox(outputPath);
+            console.log("Upload successful, URL:", uploadedUrl);
 
-        fs.writeFileSync(outputPath, obfuscatedCode);
-        console.log("Obfuscated file saved:", outputPath);
+            await fs.promises.unlink(inputPath);
+            await fs.promises.unlink(outputPath);
+            console.log("Temporary files deleted.");
 
-        console.log("Uploading to Catbox...");
-        const uploadedUrl = await uploadToCatbox(outputPath);
-        console.log("Upload successful, URL:", uploadedUrl);
+            res.json({ status: true, result: uploadedUrl });
 
-        await fs.promises.unlink(outputPath);
-        console.log("Deleted output file:", outputPath);
-
-        res.json({ status: true, result: uploadedUrl });
-
-    } catch (error) {
-        console.error("Error in /api/obfuscatedcustomv2:", error);
-        res.status(500).json({ error: "An error occurred while processing your request.", details: error.message });
-    }
-});
+        } catch (error) {
+            console.error("Error in /api/obfuscatedcustom:", error);
+            res.status(500).json({ error: "An error occurred while processing your request.", details: error.message });
+        }
+    });
+};
