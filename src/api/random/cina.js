@@ -52,40 +52,6 @@ async function obfuscateCode(sourceCode) {
         console.log("Source Code Input:");
         console.log(sourceCode);
 
-        console.log("Obfuscation Configuration:");
-        console.log({
-            target: 'node',
-            hexadecimalNumbers: true,
-            identifierGenerator: function () {
-                const randomChinese = generateRandomChinese(2);
-                return userNameForObfuscation + "气" + randomChinese;
-            },
-            preserveFunctionLength: true,
-            lock: {
-                antiDebug: true,
-                tamperProtection: true,
-                selfDefending: true,
-            },
-            variableMasking: {
-                value: true,
-                limit: 30,
-            },
-            astScrambler: true,
-            stringConcealing: true,
-            renameVariables: true,
-            renameGlobals: true,
-            renameLabels: true,
-            stringSplitting: {
-                value: true,
-                limit: 20,
-            },
-            compact: true,
-            stringCompression: true,
-        });
-
-        // Pastikan tidak ada nilai konstanta yang berubah
-        console.log("Before Obfuscation...");
-        
         let obfuscatedCode = await JsConfuser.obfuscate(sourceCode, {
             target: 'node',
             hexadecimalNumbers: true,
@@ -120,12 +86,14 @@ async function obfuscateCode(sourceCode) {
         console.log("Obfuscated Code Output:");
         console.log(obfuscatedCode);
 
-        if (typeof obfuscatedCode !== 'string') {
-            console.warn("Obfuscation output is not a string, converting to string...");
-            obfuscatedCode = JSON.stringify(obfuscatedCode);
-            console.log("Converted Obfuscated Code Output:");
-            console.log(obfuscatedCode);
+        // Pastikan hasil tidak berbentuk objek JSON yang memiliki key "code"
+        if (typeof obfuscatedCode === 'object' && obfuscatedCode.code) {
+            console.warn("Detected JSON format with 'code' key, extracting...");
+            obfuscatedCode = obfuscatedCode.code;
         }
+
+        console.log("Final Obfuscated Code Output:");
+        console.log(obfuscatedCode);
 
         return obfuscatedCode;
     } catch (error) {
