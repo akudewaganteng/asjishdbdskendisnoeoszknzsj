@@ -85,45 +85,53 @@ async function appolofree(sourceCode) {
     }
 }
 
-    app.get('/api/obfuscatedcustomv2', async (req, res) => {
-        const { apikey, fileurl, nama } = req.query;
+app.get('/api/obfuscatedcustomv2', async (req, res) => {
+    const { apikey, fileurl, nama } = req.query;
 
-        if (!apikey) return res.json({ status: false, result: "Isi Parameter Apikey." });
-        if (!fileurl) return res.json({ status: false, result: "Isi Parameter fileurl." });
-        if (!nama) return res.json({ status: false, result: "Isi Parameter Nama." });
+    if (!apikey) return res.json({ status: false, result: "Isi Parameter Apikey." });
+    if (!fileurl) return res.json({ status: false, result: "Isi Parameter fileurl." });
+    if (!nama) return res.json({ status: false, result: "Isi Parameter Nama." });
 
-        const check = config.apikey;
-        if (!check.includes(apikey)) {
-            return res.json({ status: false, result: "Apikey Tidak Valid!." });
-        }
+    const check = config.apikey;
+    if (!check.includes(apikey)) {
+        return res.json({ status: false, result: "Apikey Tidak Valid!." });
+    }
 
-        try {
-            await setUserName(nama);
+    try {
+        await setUserName(nama);
 
-            const tempDir = "/tmp";
-            const inputPath = path.join(tempDir, 'input.js');
-            const outputPath = path.join(tempDir, 'output.js');
+        const tempDir = "/tmp";
+        const inputPath = path.join(tempDir, 'input.js');
+        const outputPath = path.join(tempDir, 'output.js');
 
-            await downloadFile(fileurl, inputPath);
+        console.log("Downloading file from:", fileurl);
+        await downloadFile(fileurl, inputPath);
+        console.log("File downloaded successfully:", inputPath);
 
-            const sourceCode = fs.readFileSync(inputPath, 'utf-8');
-            const obfuscatedCode = await appolofree(sourceCode);
+        const sourceCode = fs.readFileSync(inputPath, 'utf-8');
+        console.log("File read successfully, length:", sourceCode.length);
 
-            await fs.promises.unlink(inputPath);
+        console.log("Starting obfuscation...");
+        const obfuscatedCode = await appolofree(sourceCode);
+        console.log("Obfuscation completed successfully.");
 
-            fs.writeFileSync(outputPath, obfuscatedCode);
+        await fs.promises.unlink(inputPath);
+        console.log("Deleted input file:", inputPath);
 
-            const uploadedUrl = await uploadToCatbox(outputPath);
+        fs.writeFileSync(outputPath, obfuscatedCode);
+        console.log("Obfuscated file saved:", outputPath);
 
-            await fs.promises.unlink(outputPath);
+        console.log("Uploading to Catbox...");
+        const uploadedUrl = await uploadToCatbox(outputPath);
+        console.log("Upload successful, URL:", uploadedUrl);
 
-            res.json({ status: true, result: uploadedUrl });
+        await fs.promises.unlink(outputPath);
+        console.log("Deleted output file:", outputPath);
 
-} catch (error) {
-    console.error("Error:", error); // Log error ke console
-    res.status(500).json({
-        status: false,
-        error: error.message || "An error occurred while processing your request.",
-        stack: error.stack || "No stack trace available"
-    });
-}
+        res.json({ status: true, result: uploadedUrl });
+
+    } catch (error) {
+        console.error("Error in /api/obfuscatedcustomv2:", error);
+        res.status(500).json({ error: "An error occurred while processing your request.", details: error.message });
+    }
+});
