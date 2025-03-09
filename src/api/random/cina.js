@@ -11,7 +11,7 @@ let userNameForObfuscation = '';
 const setUserName = (name) => {
     userNameForObfuscation = name;
 };
-
+module.exports = function (app) {
 function generateRandomChinese(length) {
     const chineseChars = "你好世界爱和平成功智慧力量快乐梦想";
     let result = "";
@@ -22,19 +22,10 @@ function generateRandomChinese(length) {
 }
 
 async function downloadFile(url, outputPath) {
-    const response = await axios({
-        url,
-        method: 'GET',
-        responseType: 'stream'
-    });
-
-    const writer = fs.createWriteStream(outputPath);
-    response.data.pipe(writer);
-
-    return new Promise((resolve, reject) => {
-        writer.on('finish', resolve);
-        writer.on('error', reject);
-    });
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Failed to download file: ${response.statusText}`);
+    const buffer = await response.arrayBuffer();
+    await fs.promises.writeFile(outputPath, Buffer.from(buffer));
 }
 
 async function uploadToCatbox(filePath) {
@@ -42,13 +33,20 @@ async function uploadToCatbox(filePath) {
     formData.append('reqtype', 'fileupload');
     formData.append('fileToUpload', fs.createReadStream(filePath));
 
-    const response = await axios.post('https://catbox.moe/user/api.php', formData, {
-        headers: {
-            ...formData.getHeaders(),
-        }
-    });
+    try {
+        const response = await axios.post('https://catbox.moe/user/api.php', formData, {
+            headers: {
+                ...formData.getHeaders(),
+            }
+        });
 
-    return response.data;
+        console.log("Catbox Response:", response.data); // Tambahkan log ini
+
+        return response.data;
+    } catch (error) {
+        console.error("Catbox Upload Error:", error.response ? error.response.data : error);
+        throw error;
+    }
 }
 
 async function appolofree(sourceCode) {
@@ -87,7 +85,6 @@ async function appolofree(sourceCode) {
     }
 }
 
-module.exports = function (app) {
     app.get('/api/obfuscatedcustomv2', async (req, res) => {
         const { apikey, fileurl, nama } = req.query;
 
@@ -103,7 +100,7 @@ module.exports = function (app) {
         try {
             await setUserName(nama);
 
-            const tempDir = os.tmpdir();
+            const tempDir = "/tmp";
             const inputPath = path.join(tempDir, 'input.js');
             const outputPath = path.join(tempDir, 'output.js');
 
