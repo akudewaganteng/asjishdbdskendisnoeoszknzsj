@@ -48,10 +48,6 @@ async function uploadToCatbox(filePath) {
 
 async function obfuscateCode(sourceCode) {
     try {
-        console.log("Starting obfuscation...");
-        console.log("Source Code Input:");
-        console.log(sourceCode);
-
         let obfuscatedCode = await JsConfuser.obfuscate(sourceCode, {
             target: 'node',
             hexadecimalNumbers: true,
@@ -82,22 +78,12 @@ async function obfuscateCode(sourceCode) {
             stringCompression: true,
         });
 
-        console.log("Obfuscation completed successfully.");
-        console.log("Obfuscated Code Output:");
-        console.log(obfuscatedCode);
-
-        // Pastikan hasil tidak berbentuk objek JSON yang memiliki key "code"
         if (typeof obfuscatedCode === 'object' && obfuscatedCode.code) {
-            console.warn("Detected JSON format with 'code' key, extracting...");
             obfuscatedCode = obfuscatedCode.code;
         }
 
-        console.log("Final Obfuscated Code Output:");
-        console.log(obfuscatedCode);
-
         return obfuscatedCode;
     } catch (error) {
-        console.error("Error during obfuscation:", error);
         throw error;
     }
 }
@@ -121,26 +107,18 @@ module.exports = function (app) {
             const inputPath = path.join(tempDir, 'input.js');
             const outputPath = path.join(tempDir, 'output.js');
 
-            console.log("Downloading file from:", fileurl);
             await downloadFile(fileurl, inputPath);
             
             const sourceCode = fs.readFileSync(inputPath, 'utf-8');
-            console.log("File read successfully, length:", sourceCode.length);
-
-            console.log("Starting obfuscation...");
+  
             const obfuscatedCode = await obfuscateCode(sourceCode);
-            console.log("Obfuscation completed successfully.");
 
             fs.writeFileSync(outputPath, obfuscatedCode);
-            console.log("Obfuscated file saved:", outputPath);
-
-            console.log("Uploading obfuscated file to Catbox...");
+           
             const uploadedUrl = await uploadToCatbox(outputPath);
-            console.log("Upload successful, URL:", uploadedUrl);
-
+                        
             await fs.promises.unlink(inputPath);
             await fs.promises.unlink(outputPath);
-            console.log("Temporary files deleted.");
 
             res.json({ status: true, result: uploadedUrl });
 
