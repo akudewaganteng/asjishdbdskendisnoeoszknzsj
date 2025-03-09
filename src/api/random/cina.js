@@ -81,13 +81,17 @@ async function obfuscateCode(sourceCode) {
         });
 
         console.log("Obfuscation completed successfully.");
+
+        if (typeof obfuscatedCode !== 'string') {
+            throw new Error("Obfuscation did not return a string");
+        }
+
         return obfuscatedCode;
     } catch (error) {
         console.error("Error during obfuscation:", error);
         throw error;
     }
 }
-
 module.exports = function (app) {
     app.get('/api/obfuscatedcustomv2', async (req, res) => {
         const { apikey, fileurl, nama } = req.query;
