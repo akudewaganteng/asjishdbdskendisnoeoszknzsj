@@ -161,66 +161,31 @@
         {
           "name": "Nagisa Obfuscated",
           "desc": "Javascript Obfuscated",
-          "path": "/api/obfuscated?apikey=&code=",
+          "path": "/api/obfuscated?apikey=&fileurl=",
           "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
         },
          {
           "name": "Hiura Obfuscated",
           "desc": "Javascript Obfuscated",
-          "path": "/api/obfuscatedgcorcil?apikey=&code=",
+          "path": "/api/obfuscatedgcorcil?apikey=&fileurl=",
           "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
         },
         {
           "name": "Invisible Obfuscated",
           "desc": "Javascript Obfuscated",
-          "path": "/api/invisobfuscate?apikey=&code=",
+          "path": "/api/invisobfuscate?apikey=&fileurl=",
           "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
         },
         {
           "name": "Custom Obfuscated",
           "desc": "Javascript Obfuscated",
-          "path": "/api/obfuscatedcustom?apikey=&code=&nama=",
+          "path": "/api/obfuscatedcustom?apikey=&fileurl=&nama=",
           "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
         },
         {
           "name": "Jscrambler Obfuscated",
           "desc": "Javascript Obfuscated",
-          "path": "/api/jscramblerobfuscated?apikey=&accessKey=&secretKey=&applicationId=&code=&date=",
-          "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
-        }
-      ]
-    },
-            {
-      "name": "Obfuscated JavascriptV2",
-      "items": [
-        {
-          "name": "Nagisa Obfuscated",
-          "desc": "Javascript Obfuscated",
-          "path": "/api/obfuscatedv2?apikey=&code=",
-          "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
-        },
-         {
-          "name": "Hiura Obfuscated",
-          "desc": "Javascript Obfuscated",
-          "path": "/api/obfuscatedgcorcilv2?apikey=&code=",
-          "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
-        },
-        {
-          "name": "Invisible Obfuscated",
-          "desc": "Javascript Obfuscated",
-          "path": "/api/invisobfuscatev2?apikey=&code=",
-          "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
-        },
-        {
-          "name": "Custom Obfuscated",
-          "desc": "Javascript Obfuscated",
-          "path": "/api/obfuscatedcustomv2?apikey=&fileurl=&nama=",
-          "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
-        },
-        {
-          "name": "Jscrambler Obfuscated",
-          "desc": "Javascript Obfuscated",
-          "path": "/api/jscramblerobfuscated?apikey=&accessKey=&secretKey=&applicationId=&code=&date=",
+          "path": "/api/jscramblerobfuscated?apikey=&accessKey=&secretKey=&applicationId=&fileurl=&date=",
           "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
         }
       ]
