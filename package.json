@@ -20,6 +20,7 @@
     "https": "^1.0.0",
     "node-fetch": "^2.7.0",
     "yt-search": "^2.12.1",
+       "jscrambler": "^8.3.0",
     "caliph-api": "^1.0.1",
     "crypto": "^1.0.1",
     "fb-downloader-scrapper": "^2.0.0",
