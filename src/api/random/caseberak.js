@@ -16,7 +16,7 @@ function generateRandomString(length) {
 
 function randomCaseBreakIdentifier() {
     const randomText = generateRandomString(5);
-    return `const=function${randomText}`;
+    return `function_${randomText}`;
 }
 
 async function downloadFile(url, outputPath) {
