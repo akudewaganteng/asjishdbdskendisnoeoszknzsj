@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "npm install"
+    "start": "npm start"
   },
   "author": "appolo",
   "license": "MIT",
