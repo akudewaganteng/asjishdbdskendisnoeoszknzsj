@@ -6,7 +6,7 @@ const JsConfuser = require('js-confuser');
 const config = require('../settings');
 
 function generateRandomString(length) {
-    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const chars = "casebreakcase;break-@92+";
     let result = "";
     for (let i = 0; i < length; i++) {
         result += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -16,7 +16,7 @@ function generateRandomString(length) {
 
 function randomCaseBreakIdentifier() {
     const randomText = generateRandomString(5);
-    return `case${randomText}break`;
+    return `function${randomText}case;;break`;
 }
 
 async function downloadFile(url, outputPath) {
