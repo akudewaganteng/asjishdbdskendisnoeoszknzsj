@@ -177,6 +177,12 @@
           "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
         },
         {
+          "name": "Case Break Obfuscated",
+          "desc": "Javascript Obfuscated",
+          "path": "/api/casebreak?apikey=&fileurl=",
+          "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
+        },
+        {
           "name": "Custom Obfuscated",
           "desc": "Javascript Obfuscated",
           "path": "/api/obfuscatedcustom?apikey=&fileurl=&nama=",
