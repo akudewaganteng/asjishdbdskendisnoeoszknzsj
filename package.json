@@ -5,13 +5,12 @@
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node --no-deprecation index.js"
+    "start": "npm install"
   },
   "author": "appolo",
   "license": "MIT",
   "dependencies": {
     "axios": "^1.6.8",
-    "jscrambler": "^8.3.0",
     "body-parser": "^1.20.3",
     "cheerio": "^1.0.0",
     "cors": "^2.8.5",
