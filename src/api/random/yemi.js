@@ -66,6 +66,7 @@ async function obfuscateCode(sourceCode) {
   dispatcher: true,
   flatten: true,
   stringCompression: true,
+  stringEncoding: true,
   movedDeclarations: true,
 });
 
