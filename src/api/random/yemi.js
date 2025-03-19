@@ -66,8 +66,8 @@ async function obfuscateCode(sourceCode) {
   dispatcher: true,
   flatten: true,
   stringCompression: true,
-  stringEncoding: true,
   movedDeclarations: true,
+  stringConcealing: true,
 });
 
         if (typeof obfuscatedCode === 'object' && obfuscatedCode.code) {
