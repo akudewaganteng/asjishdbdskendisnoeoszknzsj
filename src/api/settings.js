@@ -1,4 +1,4 @@
 module.exports = {
     creator: "AppoloLonely---", 
-    apikey: ["pinooganteng", "jerzz", "whaxwhixwiwokdetok"]
+    apikey: ["pinoowibu", "whaxwhixwiwokdetok", "jerzz"]
 };
