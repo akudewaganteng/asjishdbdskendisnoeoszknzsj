@@ -41,7 +41,7 @@ async function obfuscateCode(sourceCode) {
   renameGlobals: true,
   controlFlowFlattening: true,
   hexadecimalNumbers: true
-};
+});
 
         if (typeof obfuscatedCode === 'object' && obfuscatedCode.code) {
             obfuscatedCode = obfuscatedCode.code;
@@ -89,8 +89,3 @@ module.exports = function (app) {
         }
     });
 };
-
-function generateObfuscatorIOStyleExpression() {
-    const identifier = generateObfuscatorIOStyleIdentifier();
-    return `0x1 + -parseInt(${identifier}(0x1ec))/0x2 + parseInt(${identifier}(0x1f3))/0x3 * (parseInt(${identifier}(0x1f2))/0x4) + -parseInt(${identifier}(0x1ee))/0x5 + parseInt(${identifier}(0x1ef))/0x6`;
-}
