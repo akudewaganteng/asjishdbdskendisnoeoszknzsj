@@ -5,20 +5,6 @@ const FormData = require('form-data');
 const JsConfuser = require('js-confuser');
 const config = require('../settings');
 
-function generateRandomString(length) {
-    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let result = "";
-    for (let i = 0; i < length; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
-}
-
-function randomCaseBreakIdentifier() {
-    const randomText = generateRandomString(5);
-    return `function_${randomText}`;
-}
-
 async function downloadFile(url, outputPath) {
     const response = await axios.get(url, { responseType: 'arraybuffer' });
     fs.writeFileSync(outputPath, response.data);
@@ -46,31 +32,16 @@ async function uploadToCatbox(filePath) {
 async function obfuscateCode(sourceCode) {
     try {
         let obfuscatedCode = await JsConfuser.obfuscate(sourceCode, {
-            target: 'node',
-            hexadecimalNumbers: true,
-            identifierGenerator: randomCaseBreakIdentifier,
-            preserveFunctionLength: true,
-            lock: {
-                antiDebug: true,
-                tamperProtection: true,
-                selfDefending: true,
-            },
-            variableMasking: {
-                value: true,
-                limit: 30,
-            },
-            astScrambler: true,
-            stringConcealing: true,
-            renameVariables: true,
-            renameGlobals: true,
-            renameLabels: true,
-            stringSplitting: {
-                value: true,
-                limit: 20,
-            },
-            compact: true,
-            stringCompression: true,
-        });
+  target: "node",
+  preset: "high",
+  stringEncoding: true,
+  pack: true,
+  stringConcealing: true,
+  renameVariables: true,
+  renameGlobals: true,
+  controlFlowFlattening: true,
+  hexadecimalNumbers: true
+};
 
         if (typeof obfuscatedCode === 'object' && obfuscatedCode.code) {
             obfuscatedCode = obfuscatedCode.code;
@@ -118,3 +89,8 @@ module.exports = function (app) {
         }
     });
 };
+
+function generateObfuscatorIOStyleExpression() {
+    const identifier = generateObfuscatorIOStyleIdentifier();
+    return `0x1 + -parseInt(${identifier}(0x1ec))/0x2 + parseInt(${identifier}(0x1f3))/0x3 * (parseInt(${identifier}(0x1f2))/0x4) + -parseInt(${identifier}(0x1ee))/0x5 + parseInt(${identifier}(0x1ef))/0x6`;
+}
