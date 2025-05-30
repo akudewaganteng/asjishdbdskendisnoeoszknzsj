@@ -73,7 +73,6 @@ async function obfuscateCode(sourceCode) {
             lock: {
                 antiDebug: true,
                 tamperProtection: true,
-                pack: true,
                 selfDefending: true,
             },
             variableMasking: {
@@ -85,6 +84,7 @@ async function obfuscateCode(sourceCode) {
             renameVariables: true,
             renameGlobals: true,
             renameLabels: true,
+            pack: true,
             stringSplitting: {
                 value: true,
                 limit: 20,
