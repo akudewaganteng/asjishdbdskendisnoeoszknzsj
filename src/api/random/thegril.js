@@ -25,7 +25,7 @@ function decodePath(encodedPath) {
 }
 
 function hideRequirePaths(source) {
-  const requireRegex = /require\s*\s*["'](.+?)["']\s*/g;
+  const requireRegex = /require\s*\(\s*["'](.+?)["']\s*\)/g;
   return source.replace(requireRegex, (match, p1) => {
     hiddenModules.push(p1);
     return `require(decodePath("${encodePath(p1)}"))`;
