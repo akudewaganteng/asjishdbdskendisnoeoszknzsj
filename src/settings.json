@@ -177,9 +177,15 @@
           "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
         },
         {
-          "name": "Path Obfuscated",
+          "name": "Path Obfuscated V1",
           "desc": "Javascript Obfuscated",
           "path": "/api/pathketutup?apikey=&fileurl=",
+          "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
+        },
+          {
+          "name": "Path Obfuscated + anti webcrak V2",
+          "desc": "Javascript Obfuscated",
+          "path": "/api/pathketutupv2?apikey=&fileurl=",
           "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
         },
         {
