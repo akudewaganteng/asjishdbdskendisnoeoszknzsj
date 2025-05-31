@@ -65,6 +65,7 @@ async function obfuscateCode(sourceCode) {
 
         let obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
             target: 'node',
+            preset: 'high',
             hexadecimalNumbers: true,
             identifierGenerator: () => {
                 const randomChinese = generateRandomChinese(2); // misalnya menghasilkan "汉字"
