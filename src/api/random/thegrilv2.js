@@ -26,11 +26,16 @@ function hideRequirePaths(source) {
         })
         .replace(/__dirname/g, () => {
             dirnameCount++;
-            return "X_X";
+            return "Some_Thing";
         });
 
+    // Debug output
+    if (modules.length > 0) {
+        console.log(`🔍 Detected and replaced ${modules.length} module(s):`, modules);
+    }
+
     if (dirnameCount > 0) {
-        console.log(`🔒 Detected usage of __dirname ${dirnameCount}, converting to safe alias`);
+        console.log(`📁 Replaced ${dirnameCount} usage(s) of __dirname with Some_Thing`);
     }
 
     let aliasDeclaration = "";
@@ -39,10 +44,8 @@ function hideRequirePaths(source) {
     });
 
     if (dirnameCount > 0) {
-        aliasDeclaration += `const appolo_encrypt_hidden_dirname = typeof __dirname !== "undefined" ? __dirname : require("path").dirname(__filename);\n`;
+        aliasDeclaration += `const Some_Thing = typeof __dirname !== "undefined" ? __dirname : require("path").dirname(__filename);\n`;
     }
-
-    console.log(`🔍 Terdeteksi ${modules.length} module:`, modules);
 
     return aliasDeclaration + "\n" + replacedSource;
 }
