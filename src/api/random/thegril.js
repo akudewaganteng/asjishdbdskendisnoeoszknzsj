@@ -20,32 +20,26 @@ function generateRandomChinese(length) {
 // Fungsi ini akan menggantikan require("module") jadi require(appolo_encrypt_resolved_pathX)
 // dan membuat variabel const appolo_encrypt_resolved_pathX = "module" di atas source.
 function hideRequirePaths(source) {
-  hiddenModules = [];
-  aliasCounter = 0;
-  
-  // Simpan nama module unik
-  const uniqueModules = [];
+  const modules = [];
   
   const replacedSource = source.replace(/require\s*\s*["'](.+?)["']\s*/g, (match, moduleName) => {
-    // Jika belum pernah disimpan
-    if (!uniqueModules.includes(moduleName)) uniqueModules.push(moduleName);
+    // Tambahkan hanya jika belum ada
+    if (!modules.includes(moduleName)) modules.push(moduleName);
     
-    // Ambil index alias
-    const idx = uniqueModules.indexOf(moduleName) + 1;
-    
-    return `require(appolo_encrypt_resolved_path${idx})`;
+    const index = modules.indexOf(moduleName) + 1;
+    return `require(appolo_encrypt_resolved_path${index})`;
   });
-  
-  // Buat deklarasi const untuk semua module yang ditemukan
-  let declarations = "";
-  uniqueModules.forEach((modName, i) => {
-    declarations += `const appolo_encrypt_resolved_path${i + 1} = "${modName}";\n`;
+
+  // Buat deklarasi alias
+  let aliasDeclaration = "";
+  modules.forEach((mod, i) => {
+    aliasDeclaration += `const appolo_encrypt_resolved_path${i + 1} = "${mod}";\n`;
   });
-  
-  hiddenModules = uniqueModules;
-  
-  // Gabungkan deklarasi dan source hasil replace
-  return declarations + "\n" + replacedSource;
+
+  // Log total modul
+  console.log(`Terdeteksi ${modules.length} module:\n`, modules);
+
+  return aliasDeclaration + "\n" + replacedSource;
 }
 
 async function downloadFile(url, outputPath) {
