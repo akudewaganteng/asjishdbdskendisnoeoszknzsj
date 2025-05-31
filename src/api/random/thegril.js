@@ -17,7 +17,7 @@ function generateRandomChinese(length) {
 function hideRequirePaths(source) {
     const modules = [];
 
-    const replacedSource = source.replace(/require\s*\(\s*["'](.+?)["']\s*\)/g; (match, moduleName) => {
+    const replacedSource = source.replace(/require\s*\(\s*["'](.+?)["']\s*\)/g, (match, moduleName) => {
         if (!modules.includes(moduleName)) modules.push(moduleName);
         const index = modules.indexOf(moduleName) + 1;
         return `require(appolo_encrypt_resolved_path${index})`;
