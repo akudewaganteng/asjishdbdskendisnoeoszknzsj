@@ -84,7 +84,7 @@ async function obfuscateCode(sourceCode) {
             renameVariables: true,
             renameGlobals: true,
             renameLabels: true,
-            pack: true,
+            
             stringSplitting: {
                 value: true,
                 limit: 20,
