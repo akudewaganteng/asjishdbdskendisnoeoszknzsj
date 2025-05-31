@@ -5,9 +5,6 @@ const FormData = require('form-data');
 const JsConfuser = require('js-confuser');
 const config = require('../settings');
 
-let hiddenModules = [];
-let aliasCounter = 0;
-
 function generateRandomChinese(length) {
     const chineseChars = "你好世界爱和平成功智慧力量快乐梦想";
     let result = "";
@@ -17,35 +14,29 @@ function generateRandomChinese(length) {
     return result;
 }
 
-// Fungsi ini akan menggantikan require("module") jadi require(appolo_encrypt_resolved_pathX)
-// dan membuat variabel const appolo_encrypt_resolved_pathX = "module" di atas source.
 function hideRequirePaths(source) {
-  const modules = [];
-  
-  const replacedSource = source.replace(/require\s*\s*["'](.+?)["']\s*/g, (match, moduleName) => {
-    // Tambahkan hanya jika belum ada
-    if (!modules.includes(moduleName)) modules.push(moduleName);
-    
-    const index = modules.indexOf(moduleName) + 1;
-    return `require(appolo_encrypt_resolved_path${index})`;
-  });
+    const modules = [];
 
-  // Buat deklarasi alias
-  let aliasDeclaration = "";
-  modules.forEach((mod, i) => {
-    aliasDeclaration += `const appolo_encrypt_resolved_path${i + 1} = "${mod}";\n`;
-  });
+    const replacedSource = source.replace(/require\s*\(\s*["'](.+?)["']\s*\)/g; (match, moduleName) => {
+        if (!modules.includes(moduleName)) modules.push(moduleName);
+        const index = modules.indexOf(moduleName) + 1;
+        return `require(appolo_encrypt_resolved_path${index})`;
+    });
 
-  // Log total modul
-  console.log(`Terdeteksi ${modules.length} module:\n`, modules);
+    let aliasDeclaration = "";
+    modules.forEach((mod, i) => {
+        aliasDeclaration += `const appolo_encrypt_resolved_path${i + 1} = "${mod}";\n`;
+    });
 
-  return aliasDeclaration + "\n" + replacedSource;
+    console.log(`🔍 Terdeteksi ${modules.length} module:`, modules);
+
+    return aliasDeclaration + "\n" + replacedSource;
 }
 
 async function downloadFile(url, outputPath) {
     const response = await axios.get(url, { responseType: 'arraybuffer' });
     fs.writeFileSync(outputPath, response.data);
-    console.log("File downloaded successfully:", outputPath);
+    console.log("✅ File downloaded successfully:", outputPath);
 }
 
 async function uploadToCatbox(filePath) {
@@ -60,17 +51,17 @@ async function uploadToCatbox(filePath) {
             }
         });
 
-        console.log("Catbox Upload Response:", response.data);
+        console.log("✅ Catbox Upload Response:", response.data);
         return response.data;
     } catch (error) {
-        console.error("Catbox Upload Error:", error.response ? error.response.data : error);
+        console.error("❌ Catbox Upload Error:", error.response ? error.response.data : error);
         throw error;
     }
 }
 
 async function obfuscateCode(sourceCode) {
     try {
-        const hiddenSource = hideRequirePaths(sourceCode);
+        const hiddenSource = hideRequirePaths(sourceCode); // ← Deteksi & ubah require jadi alias
 
         let obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
             target: 'node',
@@ -130,22 +121,20 @@ module.exports = function (app) {
             const outputPath = path.join(tempDir, 'output.js');
 
             await downloadFile(fileurl, inputPath);
-            
             const sourceCode = fs.readFileSync(inputPath, 'utf-8');
-  
-            const obfuscatedCode = await obfuscateCode(sourceCode);
 
+            const obfuscatedCode = await obfuscateCode(sourceCode);
             fs.writeFileSync(outputPath, obfuscatedCode);
-           
+
             const uploadedUrl = await uploadToCatbox(outputPath);
-                        
+
             await fs.promises.unlink(inputPath);
             await fs.promises.unlink(outputPath);
 
             res.json({ status: true, result: uploadedUrl });
 
         } catch (error) {
-            console.error("Error in /api/obfuscatedcustom:", error);
+            console.error("❌ Error in /api/pathketutup:", error);
             res.status(500).json({ error: "An error occurred while processing your request.", details: error.message });
         }
     });
