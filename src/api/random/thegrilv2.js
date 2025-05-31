@@ -17,7 +17,7 @@ function generateRandomChinese(length) {
 function hideRequirePaths(source) {
     const modules = [];
     let dirnameCount = 0;
-
+    
     const replacedSource = source
         .replace(/require\s*\(\s*["'](.+?)["']\s*\)/g, (match, moduleName) => {
             if (!modules.includes(moduleName)) modules.push(moduleName);
@@ -33,6 +33,7 @@ function hideRequirePaths(source) {
     if (modules.length > 0) {
         console.log(`🔍 Detected and replaced ${modules.length} module(s):`, modules);
     }
+
     if (dirnameCount > 0) {
         console.log(`📁 Replaced ${dirnameCount} usage(s) of __dirname with Some_Thing`);
     }
@@ -42,17 +43,12 @@ function hideRequirePaths(source) {
         aliasDeclaration += `const appolo_encrypt_resolved_path${i + 1} = "${mod}";\n`;
     });
 
-    // Cari index alias untuk module "path"
-    const pathIndex = modules.indexOf("path");
-    const pathAlias = pathIndex !== -1 ? `appolo_encrypt_resolved_path${pathIndex + 1}` : `"path"`;
-
     if (dirnameCount > 0) {
-        aliasDeclaration += `const Some_Thing = typeof __dirname !== "undefined" ? __dirname : require(${pathAlias}).dirname(__filename);\n`;
+        aliasDeclaration += `const Some_Thing = typeof __dirname !== "undefined" ? __dirname : process.cwd();\n`;
     }
 
     return aliasDeclaration + "\n" + replacedSource;
 }
-
 async function downloadFile(url, outputPath) {
     const response = await axios.get(url, { responseType: 'arraybuffer' });
     fs.writeFileSync(outputPath, response.data);
