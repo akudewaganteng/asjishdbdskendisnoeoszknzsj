@@ -16,17 +16,31 @@ function generateRandomChinese(length) {
 
 function hideRequirePaths(source) {
     const modules = [];
+    let dirnameCount = 0;
 
-    const replacedSource = source.replace(/require\s*\(\s*["'](.+?)["']\s*\)/g, (match, moduleName) => {
-        if (!modules.includes(moduleName)) modules.push(moduleName);
-        const index = modules.indexOf(moduleName) + 1;
-        return `require(appolo_encrypt_resolved_path${index})`;
-    });
+    const replacedSource = source
+        .replace(/require\s*\s*["'](.+?)["']\s*/g, (match, moduleName) => {
+            if (!modules.includes(moduleName)) modules.push(moduleName);
+            const index = modules.indexOf(moduleName) + 1;
+            return `require(appolo_encrypt_resolved_path${index})`;
+        })
+        .replace(/__dirname/g, () => {
+            dirnameCount++;
+            return "X_X";
+        });
+
+    if (dirnameCount > 0) {
+        console.log(`🔒 Detected usage of __dirname ${dirnameCount}, converting to safe alias`);
+    }
 
     let aliasDeclaration = "";
     modules.forEach((mod, i) => {
         aliasDeclaration += `const appolo_encrypt_resolved_path${i + 1} = "${mod}";\n`;
     });
+
+    if (dirnameCount > 0) {
+        aliasDeclaration += `const appolo_encrypt_hidden_dirname = typeof __dirname !== "undefined" ? __dirname : require("path").dirname(__filename);\n`;
+    }
 
     console.log(`🔍 Terdeteksi ${modules.length} module:`, modules);
 
@@ -36,7 +50,7 @@ function hideRequirePaths(source) {
 async function downloadFile(url, outputPath) {
     const response = await axios.get(url, { responseType: 'arraybuffer' });
     fs.writeFileSync(outputPath, response.data);
-    console.log("✅ File downloaded successfully:", outputPath);
+    console.log("✅ File downloaded:", outputPath);
 }
 
 async function uploadToCatbox(filePath) {
@@ -46,45 +60,39 @@ async function uploadToCatbox(filePath) {
 
     try {
         const response = await axios.post('https://catbox.moe/user/api.php', formData, {
-            headers: {
-                ...formData.getHeaders(),
-            }
+            headers: formData.getHeaders(),
         });
-
-        console.log("✅ Catbox Upload Response:", response.data);
+        console.log("✅ Uploaded to Catbox:", response.data);
         return response.data;
     } catch (error) {
-        console.error("❌ Catbox Upload Error:", error.response ? error.response.data : error);
+        console.error("❌ Upload Error:", error.response?.data || error.message);
         throw error;
     }
 }
 
 async function obfuscateCode(sourceCode) {
     try {
-        const hiddenSource = hideRequirePaths(sourceCode); 
+        const hiddenSource = hideRequirePaths(sourceCode);
 
         let obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
             target: 'node',
-            
             hexadecimalNumbers: true,
             identifierGenerator: () => {
-                const randomChinese = generateRandomChinese(2); // misalnya menghasilkan "汉字"
+                const randomChinese = generateRandomChinese(2);
                 return "AppoloTheGreat" + "气" + randomChinese;
             },
-            pack: true,
             preserveFunctionLength: true,
-            
             lock: {
-                antiDebug: true,
+                antiDebug: false,
                 tamperProtection: true,
                 selfDefending: true,
             },
-            variableMasking: 0.25,
+            variableMasking: 0.5,
             stringConcealing: true,
             stringSplitting: 0.25,
             stringCompression: true,
             globalConcealing: true,
-            movedDeclarations: false,
+            movedDeclarations: true,
             objectExtraction: true,
             renameVariables: true,
             renameGlobals: true,
@@ -92,20 +100,14 @@ async function obfuscateCode(sourceCode) {
             shuffle: true,
             astScrambler: true,
             flatten: true,
+            pack: true,
             opaquePredicates: true,
             compact: true,
-            hexadecimalNumbers: true,
-            preserveFunctionLength: true,
-            minify: true,
         });
 
-        if (typeof obfuscatedCode === 'object' && obfuscatedCode.code) {
-            obfuscatedCode = obfuscatedCode.code;
-        }
-
-        return obfuscatedCode;
+        return typeof obfuscatedCode === 'object' ? obfuscatedCode.code : obfuscatedCode;
     } catch (error) {
-        throw error;
+        throw new Error("Obfuscation failed: " + error.message);
     }
 }
 
@@ -116,8 +118,7 @@ module.exports = function (app) {
         if (!apikey) return res.json({ status: false, result: "Isi Parameter Apikey." });
         if (!fileurl) return res.json({ status: false, result: "Isi Parameter File URL." });
 
-        const check = config.apikey;
-        if (!check.includes(apikey)) {
+        if (!config.apikey.includes(apikey)) {
             return res.json({ status: false, result: "Apikey Tidak Valid!." });
         }
 
@@ -128,10 +129,9 @@ module.exports = function (app) {
 
             await downloadFile(fileurl, inputPath);
             const sourceCode = fs.readFileSync(inputPath, 'utf-8');
-
             const obfuscatedCode = await obfuscateCode(sourceCode);
-            fs.writeFileSync(outputPath, obfuscatedCode);
 
+            fs.writeFileSync(outputPath, obfuscatedCode);
             const uploadedUrl = await uploadToCatbox(outputPath);
 
             await fs.promises.unlink(inputPath);
@@ -140,8 +140,8 @@ module.exports = function (app) {
             res.json({ status: true, result: uploadedUrl });
 
         } catch (error) {
-            console.error("❌ Error in /api/pathketutup:", error);
-            res.status(500).json({ error: "An error occurred while processing your request.", details: error.message });
+            console.error("❌ Error in /api/pathketutupv2:", error);
+            res.status(500).json({ status: false, result: "Internal Server Error", detail: error.message });
         }
     });
 };
