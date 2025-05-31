@@ -89,7 +89,7 @@ async function obfuscateCode(sourceCode) {
             shuffle: true,
             astScrambler: true,
             flatten: true,
-            pack; true,
+            pack: true,
             opaquePredicates: true,
             compact: true,
         });
