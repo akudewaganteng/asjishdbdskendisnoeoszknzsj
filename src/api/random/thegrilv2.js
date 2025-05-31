@@ -33,7 +33,6 @@ function hideRequirePaths(source) {
     if (modules.length > 0) {
         console.log(`🔍 Detected and replaced ${modules.length} module(s):`, modules);
     }
-
     if (dirnameCount > 0) {
         console.log(`📁 Replaced ${dirnameCount} usage(s) of __dirname with Some_Thing`);
     }
@@ -43,8 +42,12 @@ function hideRequirePaths(source) {
         aliasDeclaration += `const appolo_encrypt_resolved_path${i + 1} = "${mod}";\n`;
     });
 
+    // Cari index alias untuk module "path"
+    const pathIndex = modules.indexOf("path");
+    const pathAlias = pathIndex !== -1 ? `appolo_encrypt_resolved_path${pathIndex + 1}` : `"path"`;
+
     if (dirnameCount > 0) {
-        aliasDeclaration += `const Some_Thing = typeof __dirname !== "undefined" ? __dirname : require("path").dirname(__filename);\n`;
+        aliasDeclaration += `const Some_Thing = typeof __dirname !== "undefined" ? __dirname : require(${pathAlias}).dirname(__filename);\n`;
     }
 
     return aliasDeclaration + "\n" + replacedSource;
