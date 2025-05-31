@@ -5,7 +5,8 @@ const FormData = require('form-data');
 const JsConfuser = require('js-confuser');
 const config = require('../settings');
 
-const hiddenModules = [];
+let hiddenModules = [];
+let aliasCounter = 0;
 
 function generateRandomChinese(length) {
     const chineseChars = "你好世界爱和平成功智慧力量快乐梦想";
@@ -16,20 +17,35 @@ function generateRandomChinese(length) {
     return result;
 }
 
-function encodePath(filePath) {
-  return Buffer.from(filePath).toString("base64");
-}
-
-function decodePath(encodedPath) {
-  return Buffer.from(encodedPath, "base64").toString("utf-8");
-}
-
+// Fungsi ini akan menggantikan require("module") jadi require(appolo_encrypt_resolved_pathX)
+// dan membuat variabel const appolo_encrypt_resolved_pathX = "module" di atas source.
 function hideRequirePaths(source) {
-  const requireRegex = /require\s*\(\s*["'](.+?)["']\s*\)/g;
-  return source.replace(requireRegex, (match, p1) => {
-    hiddenModules.push(p1);
-    return `require(decodePath("${encodePath(p1)}"))`;
+  hiddenModules = [];
+  aliasCounter = 0;
+  
+  // Simpan nama module unik
+  const uniqueModules = [];
+  
+  const replacedSource = source.replace(/require\s*\s*["'](.+?)["']\s*/g, (match, moduleName) => {
+    // Jika belum pernah disimpan
+    if (!uniqueModules.includes(moduleName)) uniqueModules.push(moduleName);
+    
+    // Ambil index alias
+    const idx = uniqueModules.indexOf(moduleName) + 1;
+    
+    return `require(appolo_encrypt_resolved_path${idx})`;
   });
+  
+  // Buat deklarasi const untuk semua module yang ditemukan
+  let declarations = "";
+  uniqueModules.forEach((modName, i) => {
+    declarations += `const appolo_encrypt_resolved_path${i + 1} = "${modName}";\n`;
+  });
+  
+  hiddenModules = uniqueModules;
+  
+  // Gabungkan deklarasi dan source hasil replace
+  return declarations + "\n" + replacedSource;
 }
 
 async function downloadFile(url, outputPath) {
@@ -62,11 +78,7 @@ async function obfuscateCode(sourceCode) {
     try {
         const hiddenSource = hideRequirePaths(sourceCode);
 
-        // Tambahkan definisi decodePath agar tidak hilang saat obfuscation
-        const decodeHelper = `const decodePath = path => Buffer.from(path, "base64").toString("utf-8");\n\n`;
-        const sourceWithDecode = decodeHelper + hiddenSource;
-
-        let obfuscatedCode = await JsConfuser.obfuscate(sourceWithDecode, {
+        let obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
             target: 'node',
             hexadecimalNumbers: true,
             identifierGenerator: function () {
@@ -105,6 +117,7 @@ async function obfuscateCode(sourceCode) {
         throw error;
     }
 }
+
 module.exports = function (app) {
     app.get('/api/pathketutup', async (req, res) => {
         const { apikey, fileurl } = req.query;
