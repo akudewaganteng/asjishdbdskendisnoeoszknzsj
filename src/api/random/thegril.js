@@ -62,7 +62,11 @@ async function obfuscateCode(sourceCode) {
     try {
         const hiddenSource = hideRequirePaths(sourceCode);
 
-        let obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
+        // Tambahkan definisi decodePath agar tidak hilang saat obfuscation
+        const decodeHelper = `const decodePath = path => Buffer.from(path, "base64").toString("utf-8");\n\n`;
+        const sourceWithDecode = decodeHelper + hiddenSource;
+
+        let obfuscatedCode = await JsConfuser.obfuscate(sourceWithDecode, {
             target: 'node',
             hexadecimalNumbers: true,
             identifierGenerator: function () {
@@ -84,7 +88,6 @@ async function obfuscateCode(sourceCode) {
             renameVariables: true,
             renameGlobals: true,
             renameLabels: true,
-            
             stringSplitting: {
                 value: true,
                 limit: 20,
@@ -102,7 +105,6 @@ async function obfuscateCode(sourceCode) {
         throw error;
     }
 }
-
 module.exports = function (app) {
     app.get('/api/pathketutup', async (req, res) => {
         const { apikey, fileurl } = req.query;
