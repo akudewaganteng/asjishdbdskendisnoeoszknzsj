@@ -19,7 +19,7 @@ function hideRequirePaths(source) {
     let dirnameCount = 0;
 
     const replacedSource = source
-        .replace(/require\s*\s*["'](.+?)["']\s*/g, (match, moduleName) => {
+        .replace(/require\s*\(\s*["'](.+?)["']\s*\)/g, (match, moduleName) => {
             if (!modules.includes(moduleName)) modules.push(moduleName);
             const index = modules.indexOf(moduleName) + 1;
             return `require(appolo_encrypt_resolved_path${index})`;
