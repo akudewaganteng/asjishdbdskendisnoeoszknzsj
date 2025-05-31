@@ -70,7 +70,9 @@ async function obfuscateCode(sourceCode) {
                 const randomChinese = generateRandomChinese(2); // misalnya menghasilkan "汉字"
                 return "AppoloTheGreat" + "气" + randomChinese;
             },
+            pack: true,
             preserveFunctionLength: true,
+            
             lock: {
                 antiDebug: true,
                 tamperProtection: true,
@@ -82,15 +84,14 @@ async function obfuscateCode(sourceCode) {
             stringCompression: true,
             globalConcealing: true,
             movedDeclarations: true,
-            objectExtraction: true,
+            objectExtraction: false,
             renameVariables: true,
             renameGlobals: true,
             renameLabels: true,
             shuffle: true,
             astScrambler: true,
             flatten: true,
-            pack: true,
-            opaquePredicates: true,
+            opaquePredicates: false,
             compact: true,
             hexadecimalNumbers: true,
             preserveFunctionLength: true,
