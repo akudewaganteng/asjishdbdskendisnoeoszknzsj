@@ -72,7 +72,7 @@ async function obfuscateCode(sourceCode) {
             },
             preserveFunctionLength: true,
             lock: {
-                antiDebug: false,
+                antiDebug: true,
                 tamperProtection: true,
                 selfDefending: true,
             },
@@ -92,6 +92,9 @@ async function obfuscateCode(sourceCode) {
             pack: true,
             opaquePredicates: true,
             compact: true,
+            hexadecimalNumbers: true,
+            preserveFunctionLength: true,
+            minify: true,
         });
 
         if (typeof obfuscatedCode === 'object' && obfuscatedCode.code) {
