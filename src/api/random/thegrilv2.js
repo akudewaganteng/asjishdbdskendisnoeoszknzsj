@@ -72,7 +72,7 @@ async function obfuscateCode(sourceCode) {
             hexadecimalNumbers: true,
             identifierGenerator: () => {
                 const random = Math.random().toString(36).substring(2, 8);
-                return `AppoloTheGreat气气${random}`;
+                return `AppoloTheGreat${random}`;
             },
             preserveFunctionLength: true,
             lock: {
