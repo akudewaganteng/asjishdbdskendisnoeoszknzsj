@@ -5,15 +5,6 @@ const FormData = require('form-data');
 const JsConfuser = require('js-confuser');
 const config = require('../settings');
 
-function generateRandomChinese(length) {
-    const chineseChars = "你好世界爱和平成功智慧力量快乐梦想";
-    let result = "";
-    for (let i = 0; i < length; i++) {
-        result += chineseChars.charAt(Math.floor(Math.random() * chineseChars.length));
-    }
-    return result;
-}
-
 function hideRequirePaths(source) {
     const modules = [];
     let dirnameCount = 0;
@@ -76,12 +67,12 @@ async function obfuscateCode(sourceCode) {
     try {
         const hiddenSource = hideRequirePaths(sourceCode);
 
-        let obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
+        const obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
             target: 'node',
             hexadecimalNumbers: true,
             identifierGenerator: () => {
-                const randomChinese = generateRandomChinese(2);
-                return "AppoloTheGreat" + "气" + randomChinese;
+                const random = Math.random().toString(36).substring(2, 8);
+                return `AppoloTheGreat气气${random}`;
             },
             preserveFunctionLength: true,
             lock: {
