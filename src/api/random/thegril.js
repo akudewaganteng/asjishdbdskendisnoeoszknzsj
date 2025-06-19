@@ -26,19 +26,41 @@ function decodePath(encodedPath) {
 }
 
 function hideRequirePaths(source) {
-  const requireRegex = /require\s*\s*["'](.+?)["']\s*/g;
-  return source.replace(requireRegex, (match, p1) => {
+  const requireRegex = /require\s*["'](.+?)["']/g;
+  let found = false;
+
+  const replaced = source.replace(requireRegex, (match, p1) => {
+    found = true;
     hiddenModules.push(p1);
+    console.log(`🔍 Menyembunyikan require: ${p1}`);
     return `require(decodePath("${encodePath(p1)}"))`;
   });
+
+  if (!found) {
+    console.log("⚠️ Tidak ada require() yang cocok ditemukan untuk disembunyikan.");
+  }
+
+  return replaced;
 }
 
 
 function insertIntegrityCheck(sourceCode) {
   const hash = crypto.createHash('sha256').update(sourceCode).digest('hex');
 
-  const hasCrypto = /require\s*\s*['"]crypto['"]\s*/.test(sourceCode);
-  const hasFs = /require\s*\s*['"]fs['"]\s*/.test(sourceCode);
+  const hasCrypto = /require\s*["']crypto["']/.test(sourceCode);
+  const hasFs = /require\s*["']fs["']/.test(sourceCode);
+
+  if (hasCrypto) {
+    console.log("✅ 'crypto' sudah ada di source.");
+  } else {
+    console.log("➕ Menambahkan require('crypto');");
+  }
+
+  if (hasFs) {
+    console.log("✅ 'fs' sudah ada di source.");
+  } else {
+    console.log("➕ Menambahkan require('fs');");
+  }
 
   let preImports = '';
   if (!hasCrypto) preImports += `const crypto = require('crypto');\n`;
@@ -98,14 +120,14 @@ async function uploadToCatbox(filePath) {
 
 async function obfuscateCode(sourceCode) {
   try {
-    console.log("🔐 Menambahkan integrity check...");
-    const securedSource = insertIntegrityCheck(sourceCode); 
-
     console.log("👁️ Menyembunyikan path require...");
-    const hiddenSource = hideRequirePaths(securedSource); 
+    const hiddenSource = hideRequirePaths(sourceCode); // LANGKAH 1
+
+    console.log("🔐 Menambahkan integrity check...");
+    const securedSource = insertIntegrityCheck(hiddenSource); // LANGKAH 2
 
     console.log("⚙️ Memulai proses obfuscasi dengan JsConfuser...");
-    let obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
+    let obfuscatedCode = await JsConfuser.obfuscate(securedSource, {
       target: 'node',
       hexadecimalNumbers: true,
       identifierGenerator: function () {
