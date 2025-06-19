@@ -98,10 +98,14 @@ async function uploadToCatbox(filePath) {
 
 async function obfuscateCode(sourceCode) {
   try {
-   const securedSource = insertIntegrityCheck(hiddenSource); 
-   const hiddenSource = hideRequirePaths(sourceCode); 
+    console.log("🔐 Menambahkan integrity check...");
+    const securedSource = insertIntegrityCheck(sourceCode); 
 
-    let obfuscatedCode = await JsConfuser.obfuscate(securedSource, {
+    console.log("👁️ Menyembunyikan path require...");
+    const hiddenSource = hideRequirePaths(securedSource); 
+
+    console.log("⚙️ Memulai proses obfuscasi dengan JsConfuser...");
+    let obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
       target: 'node',
       hexadecimalNumbers: true,
       identifierGenerator: function () {
@@ -131,14 +135,17 @@ async function obfuscateCode(sourceCode) {
       stringCompression: true,
       debugComments: true,
       functionOutlining: true
-    }); 
+    });
 
     if (typeof obfuscatedCode === 'object' && obfuscatedCode.code) {
       obfuscatedCode = obfuscatedCode.code;
     }
 
+    console.log("✅ Obfuscasi selesai!");
     return obfuscatedCode;
+
   } catch (error) {
+    console.error("❌ Gagal saat proses obfuscasi:", error.message);
     throw error;
   }
 }
