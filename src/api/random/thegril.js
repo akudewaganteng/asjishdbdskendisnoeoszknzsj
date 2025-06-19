@@ -85,6 +85,7 @@ async function obfuscateCode(sourceCode) {
             renameVariables: true,
             renameGlobals: true,
             renameLabels: true,
+            debugComments: true,
             
             stringSplitting: {
                 value: true,
