@@ -119,7 +119,7 @@ async function obfuscateCode(sourceCode) {
         limit: 30,
       },
       astScrambler: true,
-      stringConcealing: true,
+      stringConcealing: false,
       renameVariables: true,
       renameGlobals: true,
       renameLabels: true,
