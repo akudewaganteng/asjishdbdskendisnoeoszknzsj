@@ -98,9 +98,9 @@ async function uploadToCatbox(filePath) {
 
 async function obfuscateCode(sourceCode) {
   try {
-    const securedSource = insertIntegrityCheck(hiddenSource);
-    const hiddenSource = hideRequirePaths(sourceCode);
-    
+   const securedSource = insertIntegrityCheck(hiddenSource); 
+   const hiddenSource = hideRequirePaths(sourceCode); 
+
     let obfuscatedCode = await JsConfuser.obfuscate(securedSource, {
       target: 'node',
       hexadecimalNumbers: true,
@@ -130,7 +130,8 @@ async function obfuscateCode(sourceCode) {
       compact: true,
       stringCompression: true,
       debugComments: true,
-      functionOutlining: true,
+      functionOutlining: true
+    }); 
 
     if (typeof obfuscatedCode === 'object' && obfuscatedCode.code) {
       obfuscatedCode = obfuscatedCode.code;
