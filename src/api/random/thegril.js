@@ -93,6 +93,7 @@ async function obfuscateCode(sourceCode) {
             },
             compact: true,
             stringCompression: true,
+            functionOutlining: true,
         });
 
         if (typeof obfuscatedCode === 'object' && obfuscatedCode.code) {
