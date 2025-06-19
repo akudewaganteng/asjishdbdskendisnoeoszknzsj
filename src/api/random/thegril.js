@@ -98,9 +98,9 @@ async function uploadToCatbox(filePath) {
 
 async function obfuscateCode(sourceCode) {
   try {
-    const hiddenSource = hideRequirePaths(sourceCode);
     const securedSource = insertIntegrityCheck(hiddenSource);
-
+    const hiddenSource = hideRequirePaths(sourceCode);
+    
     let obfuscatedCode = await JsConfuser.obfuscate(securedSource, {
       target: 'node',
       hexadecimalNumbers: true,
@@ -119,7 +119,7 @@ async function obfuscateCode(sourceCode) {
         limit: 30,
       },
       astScrambler: true,
-      stringConcealing: false,
+      stringConcealing: true,
       renameVariables: true,
       renameGlobals: true,
       renameLabels: true,
@@ -131,34 +131,6 @@ async function obfuscateCode(sourceCode) {
       stringCompression: true,
       debugComments: true,
       functionOutlining: true,
-
-      customStringEncodings: {
-        AppoloTheGreat: {
-          encode: (value) => {
-            const key = 'XAppoloGreatFather';
-            const xor = value.split('').map((char, i) =>
-              String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(i % key.length))
-            ).join('');
-            return Buffer.from(xor).toString('base64');
-          },
-          decode: (encoded) => {
-            return `
-              (() => {
-                const base64 = "${encoded}";
-                const key = "AppoloXOR";
-                const decoded = Buffer.from(base64, "base64").toString();
-                let result = "";
-                for (let i = 0; i < decoded.length; i++) {
-                  result += String.fromCharCode(decoded.charCodeAt(i) ^ key.charCodeAt(i % key.length));
-                }
-                return result;
-              })()
-            `;
-          }
-        }
-      },
-      stringEncoding: ["AppoloTheGreat"]
-    });
 
     if (typeof obfuscatedCode === 'object' && obfuscatedCode.code) {
       obfuscatedCode = obfuscatedCode.code;
