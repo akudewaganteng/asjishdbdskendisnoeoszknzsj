@@ -25,6 +25,13 @@ function decodePath(encodedPath) {
   return Buffer.from(encodedPath, "base64").toString("utf-8");
 }
 
+function hideRequirePaths(source) {
+  const requireRegex = /require\s*\s*["'](.+?)["']\s*/g;
+  return source.replace(requireRegex, (match, p1) => {
+    hiddenModules.push(p1);
+    return `require(decodePath("${encodePath(p1)}"))`;
+  });
+}
 
 
 function insertIntegrityCheck(sourceCode) {
@@ -62,13 +69,6 @@ try {
   return `(function(){\n${checkCode}\n})();\n` + sourceCode;
 }
 
-function hideRequirePaths(source) {
-  const requireRegex = /require\s*\s*["'](.+?)["']\s*/g;
-  return source.replace(requireRegex, (match, p1) => {
-    hiddenModules.push(p1);
-    return `require(decodePath("${encodePath(p1)}"))`;
-  });
-}
 
 async function downloadFile(url, outputPath) {
     const response = await axios.get(url, { responseType: 'arraybuffer' });
