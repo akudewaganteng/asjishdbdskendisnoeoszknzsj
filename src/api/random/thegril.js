@@ -26,7 +26,7 @@ function decodePath(encodedPath) {
 }
 
 function hideRequirePaths(source) {
-  const requireRegex = /require\s*["'](.+?)["']/g;
+  const requireRegex = /require\s*\s*["'](.+?)["']\s*/g;
   let found = false;
 
   const replaced = source.replace(requireRegex, (match, p1) => {
