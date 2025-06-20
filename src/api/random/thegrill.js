@@ -81,14 +81,13 @@ async function obfuscateCode(sourceCode) {
                 antiDebug: true,
                 tamperProtection: true,
                 selfDefending: true,
-            },
-
-            integrity: true,
-            countermeasures: {
-                consoleClear: true,
-                infiniteLoop: true,
-                disableDebugger: true,
-                overrideConsole: true
+                integrity: true,
+                countermeasures: {
+                    consoleClear: true,
+                    infiniteLoop: true,
+                    disableDebugger: true,
+                    overrideConsole: true
+                }
             },
 
             variableMasking: {
