@@ -68,46 +68,47 @@ async function obfuscateCode(sourceCode) {
         const hiddenSource = hideRequirePaths(sourceCode);
 
         console.log("🔒 Menambahkan proteksi integrity dan anti-tamper...");
-        let obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
-            target: 'node',
-            hexadecimalNumbers: true,
-            identifierGenerator: function () {
-                const randomChinese = generateRandomChinese(2);
-                return "AppoloTheGreat" + "气" + randomChinese;
-            },
-            preserveFunctionLength: true,
+let obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
+  target: 'node',
+  hexadecimalNumbers: true,
+  identifierGenerator: function () {
+    const randomChinese = generateRandomChinese(2);
+    return "@SilentMoop" + "气" + randomChinese;
+  },
+  preserveFunctionLength: true,
 
-            lock: {
-                antiDebug: true,
-                tamperProtection: true,
-                selfDefending: true,
-                integrity: true,
-                countermeasures: {
-                    consoleClear: true,
-                    infiniteLoop: true,
-                    disableDebugger: true,
-                    overrideConsole: true
-                }
-            },
+  lock: {
+    antiDebug: true,
+    tamperProtection: true,
+    selfDefending: true,
+    integrity: true,
+  },
 
-            variableMasking: {
-                value: true,
-                limit: 30,
-            },
-            astScrambler: true,
-            stringConcealing: true,
-            renameVariables: true,
-            renameGlobals: true,
-            renameLabels: true,
-            stringSplitting: {
-                value: true,
-                limit: 20,
-            },
-            compact: true,
-            stringCompression: true,
-            debugComments: true,
-            functionOutlining: true
-        });
+  countermeasures: [
+    "consoleClear",
+    "infiniteLoop",
+    "disableDebugger",
+    "overrideConsole"
+  ],
+
+  variableMasking: {
+    value: true,
+    limit: 30,
+  },
+  astScrambler: true,
+  stringConcealing: true,
+  renameVariables: true,
+  renameGlobals: true,
+  renameLabels: true,
+  stringSplitting: {
+    value: true,
+    limit: 20,
+  },
+  compact: true,
+  stringCompression: true,
+  debugComments: true,
+  functionOutlining: true
+});
 
         if (typeof obfuscatedCode === 'object' && obfuscatedCode.code) {
             obfuscatedCode = obfuscatedCode.code;
