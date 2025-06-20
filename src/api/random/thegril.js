@@ -43,55 +43,6 @@ function hideRequirePaths(source) {
   return replaced;
 }
 
-
-function insertIntegrityCheck(sourceCode) {
-  const hash = crypto.createHash('sha256').update(sourceCode).digest('hex');
-
-  const hasCrypto = /require\s*["']crypto["']/.test(sourceCode);
-  const hasFs = /require\s*["']fs["']/.test(sourceCode);
-
-  if (hasCrypto) {
-    console.log("✅ 'crypto' sudah ada di source.");
-  } else {
-    console.log("➕ Menambahkan require('crypto');");
-  }
-
-  if (hasFs) {
-    console.log("✅ 'fs' sudah ada di source.");
-  } else {
-    console.log("➕ Menambahkan require('fs');");
-  }
-
-  let preImports = '';
-  if (!hasCrypto) preImports += `const crypto = require('crypto');\n`;
-  if (!hasFs) preImports += `const fs = require('fs');\n`;
-
-  const checkCode = `
-${preImports}
-console.log("🚀 Checking Integrity...");
-
-try {
-    const currentCode = fs.readFileSync(__filename, 'utf8');
-    const currentHash = crypto.createHash('sha256').update(currentCode).digest('hex');
-    const originalHash = "${hash}";
-
-    if (currentHash !== originalHash) {
-        console.log("❌ Code has been modified!");
-        console.log("🛑 Exiting for safety.");
-        process.exit(1);
-    } else {
-        console.log("✅ Checking Success!");
-    }
-} catch (err) {
-    console.log("❌ Error during integrity check:", err.message);
-    process.exit(1);
-}
-`;
-
-  return `(function(){\n${checkCode}\n})();\n` + sourceCode;
-}
-
-
 async function downloadFile(url, outputPath) {
     const response = await axios.get(url, { responseType: 'arraybuffer' });
     fs.writeFileSync(outputPath, response.data);
@@ -120,14 +71,37 @@ async function uploadToCatbox(filePath) {
 
 async function obfuscateCode(sourceCode) {
   try {
-    console.log("👁️ Menyembunyikan path require...");
-    const hiddenSource = hideRequirePaths(sourceCode); // LANGKAH 1
+    const originalSource = sourceCode; // simpan source asli SEBELUM diubah apa pun
 
-    console.log("🔐 Menambahkan integrity check...");
-    const securedSource = insertIntegrityCheck(hiddenSource); // LANGKAH 2
+    console.log("👁️ Menyembunyikan path require...");
+    const hiddenSource = hideRequirePaths(sourceCode); // ini untuk obfuscation
+
+    const hasCrypto = /require\s*\s*['"]crypto['"]\s*/.test(originalSource);
+    const hasFs = /require\s*\s*['"]fs['"]\s*/.test(originalSource);
+
+    // HASH terhadap source asli (belum diubah)
+    const hash = crypto.createHash('sha256').update(originalSource).digest('hex');
+
+    // Sisipkan tamperCheck
+    const tamperCheckCode = `
+${hasCrypto ? '' : `const crypto = require('crypto');`}
+${hasFs ? '' : `const fs = require('fs');`}
+
+function tamperCheck(originalHash) {
+  const currentCode = fs.readFileSync(__filename, 'utf-8');
+  const hash = crypto.createHash('sha256').update(currentCode).digest('hex');
+  if (hash !== originalHash) {
+    throw new Error("🚨 Tampering Detected! Script execution stopped.");
+  }
+  console.log("✅ Checking Your Coder Success");
+}
+tamperCheck("${hash}");
+`;
+
+    const finalCode = tamperCheckCode + "\n" + hiddenSource;
 
     console.log("⚙️ Memulai proses obfuscasi dengan JsConfuser...");
-    let obfuscatedCode = await JsConfuser.obfuscate(securedSource, {
+    let obfuscatedCode = await JsConfuser.obfuscate(finalCode, {
       target: 'node',
       hexadecimalNumbers: true,
       identifierGenerator: function () {
@@ -163,7 +137,7 @@ async function obfuscateCode(sourceCode) {
       obfuscatedCode = obfuscatedCode.code;
     }
 
-    console.log("✅ Obfuscasi selesai!");
+    console.log("✅ Obfuscasi selesai dengan tamper protection!");
     return obfuscatedCode;
 
   } catch (error) {
