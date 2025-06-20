@@ -99,7 +99,7 @@ function onLockTriggered() {
       hexadecimalNumbers: true,
       identifierGenerator: function () {
         const randomChinese = generateRandomChinese(2);
-        return "@SilentMoop" + "气" + randomChinese;
+        return "AppoloTheGreat" + "气" + randomChinese;
       },
       preserveFunctionLength: true,
       lock: {
