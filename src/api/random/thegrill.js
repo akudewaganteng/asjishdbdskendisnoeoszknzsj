@@ -68,46 +68,70 @@ async function obfuscateCode(sourceCode) {
         const hiddenSource = hideRequirePaths(sourceCode);
 
         console.log("🔒 Menambahkan proteksi integrity dan anti-tamper...");
-let obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
-  target: 'node',
-  hexadecimalNumbers: true,
-  identifierGenerator: function () {
-    const randomChinese = generateRandomChinese(2);
-    return "@SilentMoop" + "气" + randomChinese;
-  },
-  preserveFunctionLength: true,
 
-  lock: {
-    antiDebug: true,
-    tamperProtection: true,
-    selfDefending: true,
-    integrity: true,
-    countermeasures: [
-      "consoleClear",
-      "disableDebugger",
-      "infiniteLoop",
-      "overrideConsole"
-    ]
-  },
+        const countermeasures = [
+            function consoleClear() {
+                try {
+                    console.clear();
+                } catch (e) {}
+            },
+            function disableDebugger() {
+                try {
+                    setInterval(() => {
+                        debugger;
+                    }, 100);
+                } catch (e) {}
+            },
+            function infiniteLoop() {
+                while (true) {}
+            },
+            function overrideConsole() {
+                try {
+                    const fake = () => {};
+                    console.log = fake;
+                    console.warn = fake;
+                    console.error = fake;
+                    console.info = fake;
+                    console.debug = fake;
+                } catch (e) {}
+            }
+        ];
 
-  variableMasking: {
-    value: true,
-    limit: 30,
-  },
-  astScrambler: true,
-  stringConcealing: true,
-  renameVariables: true,
-  renameGlobals: true,
-  renameLabels: true,
-  stringSplitting: {
-    value: true,
-    limit: 20,
-  },
-  compact: true,
-  stringCompression: true,
-  debugComments: true,
-  functionOutlining: true
-});
+        let obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
+            target: 'node',
+            hexadecimalNumbers: true,
+            identifierGenerator: function () {
+                const randomChinese = generateRandomChinese(2);
+                return "@SilentMoop" + "气" + randomChinese;
+            },
+            preserveFunctionLength: true,
+
+            lock: {
+                antiDebug: true,
+                tamperProtection: true,
+                selfDefending: true,
+                integrity: true,
+                countermeasures: countermeasures // ✅ masukkan array function, bukan string
+            },
+
+            variableMasking: {
+                value: true,
+                limit: 30,
+            },
+            astScrambler: true,
+            stringConcealing: true,
+            renameVariables: true,
+            renameGlobals: true,
+            renameLabels: true,
+            stringSplitting: {
+                value: true,
+                limit: 20,
+            },
+            compact: true,
+            stringCompression: true,
+            debugComments: true,
+            functionOutlining: true
+        });
 
         if (typeof obfuscatedCode === 'object' && obfuscatedCode.code) {
             obfuscatedCode = obfuscatedCode.code;
