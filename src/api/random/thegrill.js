@@ -67,19 +67,25 @@ async function obfuscateCode(sourceCode) {
     console.log("👁️ Menyembunyikan path require...");
     const hiddenSource = hideRequirePaths(sourceCode); // tahap awal
 
-    console.log("⚙️ Obfuscasi tahap 1 (tanpa integrity check)...");
-    let tempObfuscated = await JsConfuser.obfuscate(hiddenSource, {
+    // Tambahkan integritas checker dummy untuk placeholder dulu
+    const dummyIntegrity = '// __INTEGRITY_CHECK_PLACEHOLDER__\n';
+    const withPlaceholder = dummyIntegrity + hiddenSource;
+
+    console.log("⚙️ Obfuscasi tahap 1 (tanpa hash final)...");
+    let obfuscatedStage1 = await JsConfuser.obfuscate(withPlaceholder, {
       target: 'node',
       compact: true,
-      stringCompression: true,
+      stringCompression: true
     });
 
-    if (typeof tempObfuscated === 'object' && tempObfuscated.code) {
-      tempObfuscated = tempObfuscated.code;
+    if (typeof obfuscatedStage1 === 'object' && obfuscatedStage1.code) {
+      obfuscatedStage1 = obfuscatedStage1.code;
     }
 
-    console.log("🚀 Checking Integrity...");
+    // Sekarang kita hitung hash dari hasil obfuscate awal
+    const hash = crypto.createHash('sha256').update(obfuscatedStage1).digest('hex');
 
+    // Cek apakah sudah ada require fs/crypto
     const hasCrypto = /require\s*\s*['"]crypto['"]\s*/.test(sourceCode);
     const hasFs = /require\s*\s*['"]fs['"]\s*/.test(sourceCode);
 
@@ -87,30 +93,28 @@ async function obfuscateCode(sourceCode) {
     if (!hasCrypto) preImports += `const crypto = require('crypto');\n`;
     if (!hasFs) preImports += `const fs = require('fs');\n`;
 
-    const hash = crypto.createHash('sha256').update(tempObfuscated).digest('hex');
-
-    const integrityChecker = `
-(function(){
-  ${preImports}
-  console.log("🚀 Checking Integrity...");
-  try {
-    const code = fs.readFileSync(__filename, 'utf8');
-    const hash = crypto.createHash('sha256').update(code).digest('hex');
-    if (hash !== "${hash}") {
-      console.log("❌ Code has been modified!");
-      process.exit(1);
-    } else {
-      console.log("✅ Checking Success!");
-    }
-  } catch (e) {
-    console.log("❌ Integrity Error:", e.message);
+    const integrityCode = `
+${preImports}
+console.log("🚀 Checking Integrity...");
+try {
+  const code = fs.readFileSync(__filename, 'utf8');
+  const hash = crypto.createHash('sha256').update(code).digest('hex');
+  if (hash !== "${hash}") {
+    console.log("❌ Code has been modified!");
     process.exit(1);
+  } else {
+    console.log("✅ Checking Success!");
   }
-})();`;
+} catch (e) {
+  console.log("❌ Integrity Error:", e.message);
+  process.exit(1);
+}
+`;
 
-    const combinedCode = integrityChecker + "\n" + hiddenSource;
+    // Ganti placeholder dengan code asli
+    const combinedCode = withPlaceholder.replace(dummyIntegrity.trim(), `(function(){\n${integrityCode}\n})();`);
 
-    console.log("🛡️ Obfuscasi akhir (dengan integrity check)...");
+    console.log("🛡️ Obfuscasi akhir (semua termasuk checker)...");
     let finalObfuscated = await JsConfuser.obfuscate(combinedCode, {
       target: 'node',
       hexadecimalNumbers: true,
@@ -147,7 +151,7 @@ async function obfuscateCode(sourceCode) {
       finalObfuscated = finalObfuscated.code;
     }
 
-    console.log("✅ Obfuscasi selesai dengan integrity check terproteksi!");
+    console.log("✅ Obfuscasi selesai dengan integrity check TERPROTEKSI!");
     return finalObfuscated;
 
   } catch (error) {
@@ -155,7 +159,6 @@ async function obfuscateCode(sourceCode) {
     throw error;
   }
 }
-
 module.exports = function (app) {
     app.get('/api/pathketutup', async (req, res) => {
         const { apikey, fileurl } = req.query;
