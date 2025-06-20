@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const FormData = require('form-data');
 const JsConfuser = require('js-confuser');
+const crypto = require('crypto');
 const config = require('../settings');
 
 const hiddenModules = [];
