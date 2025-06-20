@@ -63,102 +63,79 @@ async function uploadToCatbox(filePath) {
 }
 
 async function obfuscateCode(sourceCode) {
-  try {
-    console.log("👁️ Menyembunyikan path require...");
-    const hiddenSource = hideRequirePaths(sourceCode); // tahap awal
+    try {
+        console.log("👁️ Menyembunyikan path require...");
+        const hiddenSource = hideRequirePaths(sourceCode);
 
-    // Tambahkan integritas checker dummy untuk placeholder dulu
-    const dummyIntegrity = '// __INTEGRITY_CHECK_PLACEHOLDER__\n';
-    const withPlaceholder = dummyIntegrity + hiddenSource;
+        console.log("🔒 Menambahkan proteksi integrity dan anti-tamper...");
+        let obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
+            target: 'node',
+            hexadecimalNumbers: true,
+            identifierGenerator: function () {
+                const randomChinese = generateRandomChinese(2);
+                return "AppoloTheGreat" + "气" + randomChinese;
+            },
+            preserveFunctionLength: true,
 
-    console.log("⚙️ Obfuscasi tahap 1 (tanpa hash final)...");
-    let obfuscatedStage1 = await JsConfuser.obfuscate(withPlaceholder, {
-      target: 'node',
-      compact: true,
-      stringCompression: true
-    });
+            lock: {
+                antiDebug: true,
+                tamperProtection: true,
+                selfDefending: true,
+            },
 
-    if (typeof obfuscatedStage1 === 'object' && obfuscatedStage1.code) {
-      obfuscatedStage1 = obfuscatedStage1.code;
+            integrity: true,
+            countermeasures: {
+                consoleClear: true,
+                infiniteLoop: true,
+                disableDebugger: true,
+                overrideConsole: true
+            },
+
+            variableMasking: {
+                value: true,
+                limit: 30,
+            },
+            astScrambler: true,
+            stringConcealing: true,
+            renameVariables: true,
+            renameGlobals: true,
+            renameLabels: true,
+            stringSplitting: {
+                value: true,
+                limit: 20,
+            },
+            compact: true,
+            stringCompression: true,
+            debugComments: true,
+            functionOutlining: true
+        });
+
+        if (typeof obfuscatedCode === 'object' && obfuscatedCode.code) {
+            obfuscatedCode = obfuscatedCode.code;
+        }
+
+        const headerComment = `/*
+This Code Obfuscated By Website
+
+Copyright 
+@SilentMoop | https://sick--delta.vercel.app/
+
+New Features:
+Anti Change String 
+Anti Change Variable
+*/\n`;
+
+        const finalCode = headerComment + obfuscatedCode;
+
+        console.log("✅ Obfuscasi selesai dengan integrity dan komentar branding!");
+        return finalCode;
+
+    } catch (error) {
+        console.error("❌ Gagal saat proses obfuscasi:", error.message);
+        throw error;
     }
-
-    // Sekarang kita hitung hash dari hasil obfuscate awal
-    const hash = crypto.createHash('sha256').update(obfuscatedStage1).digest('hex');
-
-    // Cek apakah sudah ada require fs/crypto
-    const hasCrypto = /require\s*\s*['"]crypto['"]\s*/.test(sourceCode);
-    const hasFs = /require\s*\s*['"]fs['"]\s*/.test(sourceCode);
-
-    let preImports = '';
-    if (!hasCrypto) preImports += `const crypto = require('crypto');\n`;
-    if (!hasFs) preImports += `const fs = require('fs');\n`;
-
-    const integrityCode = `
-${preImports}
-console.log("🚀 Checking Integrity...");
-try {
-  const code = fs.readFileSync(__filename, 'utf8');
-  const hash = crypto.createHash('sha256').update(code).digest('hex');
-  if (hash !== "${hash}") {
-    console.log("❌ Code has been modified!");
-    process.exit(1);
-  } else {
-    console.log("✅ Checking Success!");
-  }
-} catch (e) {
-  console.log("❌ Integrity Error:", e.message);
-  process.exit(1);
 }
-`;
 
-    // Ganti placeholder dengan code asli
-    const combinedCode = withPlaceholder.replace(dummyIntegrity.trim(), `(function(){\n${integrityCode}\n})();`);
-
-    console.log("🛡️ Obfuscasi akhir (semua termasuk checker)...");
-    let finalObfuscated = await JsConfuser.obfuscate(combinedCode, {
-      target: 'node',
-      hexadecimalNumbers: true,
-      identifierGenerator: () => {
-        const randomChinese = generateRandomChinese(2);
-        return "AppoloTheGreat" + "气" + randomChinese;
-      },
-      preserveFunctionLength: true,
-      lock: {
-        antiDebug: true,
-        tamperProtection: true,
-        selfDefending: true,
-      },
-      variableMasking: {
-        value: true,
-        limit: 30,
-      },
-      astScrambler: true,
-      stringConcealing: true,
-      renameVariables: true,
-      renameGlobals: true,
-      renameLabels: true,
-      stringSplitting: {
-        value: true,
-        limit: 20,
-      },
-      compact: true,
-      stringCompression: true,
-      debugComments: true,
-      functionOutlining: true
-    });
-
-    if (typeof finalObfuscated === 'object' && finalObfuscated.code) {
-      finalObfuscated = finalObfuscated.code;
-    }
-
-    console.log("✅ Obfuscasi selesai dengan integrity check TERPROTEKSI!");
-    return finalObfuscated;
-
-  } catch (error) {
-    console.error("❌ Gagal saat proses obfuscasi:", error.message);
-    throw error;
-  }
-}
 module.exports = function (app) {
     app.get('/api/pathketutup', async (req, res) => {
         const { apikey, fileurl } = req.query;
