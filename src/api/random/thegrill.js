@@ -35,6 +35,42 @@ function hideRequirePaths(source) {
     return aliasDeclaration + "\n" + replacedSource;
 }
 
+function insertIntegrityCheck(sourceCode) {
+  const hash = crypto.createHash('sha256').update(sourceCode).digest('hex');
+
+  const hasCrypto = /require\s*\s*['"]crypto['"]\s*/.test(sourceCode);
+  const hasFs = /require\s*\s*['"]fs['"]\s*/.test(sourceCode);
+
+  let preImports = '';
+  if (!hasCrypto) preImports += `const crypto = require('crypto');\n`;
+  if (!hasFs) preImports += `const fs = require('fs');\n`;
+
+  const checkCode = `
+${preImports}
+console.log("🚀 Checking Integrity...");
+
+try {
+    const currentCode = fs.readFileSync(__filename, 'utf8');
+    const currentHash = crypto.createHash('sha256').update(currentCode).digest('hex');
+    const originalHash = "${hash}";
+
+    if (currentHash !== originalHash) {
+        console.log("❌ Code has been modified!");
+        console.log("🛑 Exiting for safety.");
+        process.exit(1);
+    } else {
+        console.log("✅ Checking Success!");
+    }
+} catch (err) {
+    console.log("❌ Error during integrity check:", err.message);
+    process.exit(1);
+}
+`;
+
+  return `(function(){\n${checkCode}\n})();\n` + sourceCode;
+}
+
+
 async function downloadFile(url, outputPath) {
     const response = await axios.get(url, { responseType: 'arraybuffer' });
     fs.writeFileSync(outputPath, response.data);
@@ -62,48 +98,57 @@ async function uploadToCatbox(filePath) {
 }
 
 async function obfuscateCode(sourceCode) {
-    try {
-        const hiddenSource = hideRequirePaths(sourceCode);
+  try {
+    console.log("🔐 Menambahkan integrity check...");
+    const securedSource = insertIntegrityCheck(sourceCode); 
 
-        let obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
-            target: 'node',
-            hexadecimalNumbers: true,
-            identifierGenerator: function () {
-                const randomChinese = generateRandomChinese(2);
-                return "AppoloTheGreat" + "气" + randomChinese;
-            },
-            preserveFunctionLength: true,
-            lock: {
-                antiDebug: true,
-                tamperProtection: true,
-                selfDefending: true,
-            },
-            variableMasking: {
-                value: true,
-                limit: 30,
-            },
-            astScrambler: true,
-            functionOutlining: true,
-            stringConcealing: true,
-            renameVariables: true,
-            renameGlobals: true,
-            renameLabels: true,
-            stringSplitting: {
-                value: true,
-                limit: 20,
-            },
-            compact: true,
-            stringCompression: true,
-        });
+    console.log("👁️ Menyembunyikan path require...");
+    const hiddenSource = hideRequirePaths(securedSource); 
 
-        if (typeof obfuscatedCode === 'object' && obfuscatedCode.code) {
-            obfuscatedCode = obfuscatedCode.code;
-        }
+    console.log("⚙️ Memulai proses obfuscasi dengan JsConfuser...");
+    let obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
+      target: 'node',
+      hexadecimalNumbers: true,
+      identifierGenerator: function () {
+        const randomChinese = generateRandomChinese(2);
+        return "AppoloTheGreat" + "气" + randomChinese;
+      },
+      preserveFunctionLength: true,
+      lock: {
+        antiDebug: true,
+        tamperProtection: true,
+        selfDefending: true,
+      },
+      variableMasking: {
+        value: true,
+        limit: 30,
+      },
+      astScrambler: true,
+      stringConcealing: true,
+      renameVariables: true,
+      renameGlobals: true,
+      renameLabels: true,
+      stringSplitting: {
+        value: true,
+        limit: 20,
+      },
+      compact: true,
+      stringCompression: true,
+      debugComments: true,
+      functionOutlining: true
+    });
 
-        return obfuscatedCode;
-    } catch (error) {
-        throw error;
+    if (typeof obfuscatedCode === 'object' && obfuscatedCode.code) {
+      obfuscatedCode = obfuscatedCode.code;
     }
+
+    console.log("✅ Obfuscasi selesai!");
+    return obfuscatedCode;
+
+  } catch (error) {
+    console.error("❌ Gagal saat proses obfuscasi:", error.message);
+    throw error;
+  }
 }
 
 module.exports = function (app) {
