@@ -80,7 +80,7 @@ async function obfuscateCode(sourceCode) {
                 limit: 30,
             },
             astScrambler: true,
-            functionOutlining: true,
+            
             stringConcealing: true,
             renameVariables: true,
             renameGlobals: true,
