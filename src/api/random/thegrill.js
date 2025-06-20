@@ -73,7 +73,6 @@ async function obfuscateCode(sourceCode) {
             lock: {
                 antiDebug: true,
                 tamperProtection: true,
-                pack: true,
                 selfDefending: true,
             },
             variableMasking: {
