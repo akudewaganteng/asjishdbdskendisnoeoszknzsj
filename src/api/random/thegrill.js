@@ -16,20 +16,23 @@ function generateRandomChinese(length) {
     return result;
 }
 
-function encodePath(filePath) {
-  return Buffer.from(filePath).toString("base64");
-}
-
-function decodePath(encodedPath) {
-  return Buffer.from(encodedPath, "base64").toString("utf-8");
-}
-
 function hideRequirePaths(source) {
-  const requireRegex = /require\s*\s*["'](.+?)["']\s*/g;
-  return source.replace(requireRegex, (match, p1) => {
-    hiddenModules.push(p1);
-    return `require(decodePath("${encodePath(p1)}"))`;
-  });
+    const modules = [];
+
+    const replacedSource = source.replace(/require\s*\(\s*["'](.+?)["']\s*\)/g, (match, moduleName) => {
+        if (!modules.includes(moduleName)) modules.push(moduleName);
+        const index = modules.indexOf(moduleName) + 1;
+        return `require(appolo_encrypt_resolved_path${index})`;
+    });
+
+    let aliasDeclaration = "";
+    modules.forEach((mod, i) => {
+        aliasDeclaration += `const appolo_encrypt_resolved_path${i + 1} = "${mod}";\n`;
+    });
+
+    console.log(`🔍 Terdeteksi ${modules.length} module:`, modules);
+
+    return aliasDeclaration + "\n" + replacedSource;
 }
 
 async function downloadFile(url, outputPath) {
@@ -73,6 +76,7 @@ async function obfuscateCode(sourceCode) {
             lock: {
                 antiDebug: true,
                 tamperProtection: true,
+                pack: true,
                 selfDefending: true,
             },
             variableMasking: {
@@ -80,7 +84,7 @@ async function obfuscateCode(sourceCode) {
                 limit: 30,
             },
             astScrambler: true,
-            
+            functionOutlining: true,
             stringConcealing: true,
             renameVariables: true,
             renameGlobals: true,
