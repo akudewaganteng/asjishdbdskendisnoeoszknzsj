@@ -106,15 +106,21 @@ async function obfuscateCode(sourceCode) {
             },
             preserveFunctionLength: true,
 
-            lock: {
-                antiDebug: true,
-                tamperProtection: true,
-                selfDefending: true,
-                integrity: true,
-                countermeasures: ["consoleClear", "disableDebugger", "infiniteLoop", "overrideConsole"]
-            },
+lock: {
+  antiDebug: true,
+  tamperProtection: true,
+  selfDefending: true,
+  integrity: true,
+  countermeasures: [
+    "consoleClear",
+    "disableDebugger",
+    "infiniteLoop",
+    "overrideConsole"
+  ]
+},
 
-            countermeasures, // ✅ Tambahkan definisinya di luar "lock"
+// ❌ Hapus baris ini karena tidak valid
+// countermeasures,
 
             variableMasking: {
                 value: true,
