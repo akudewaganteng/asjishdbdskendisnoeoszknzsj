@@ -99,12 +99,11 @@ async function uploadToCatbox(filePath) {
 
 async function obfuscateCode(sourceCode) {
   try {
-  
     console.log("👁️ Menyembunyikan path require...");
-    const hiddenSource = hideRequirePaths(securedSource); 
-  
+    const hiddenSource = hideRequirePaths(sourceCode); // LANGKAH 1: sembunyikan require()
+
     console.log("🔐 Menambahkan integrity check...");
-    const securedSource = insertIntegrityCheck(sourceCode);     
+    const securedSource = insertIntegrityCheck(hiddenSource); // LANGKAH 2: integrity check
 
     console.log("⚙️ Memulai proses obfuscasi dengan JsConfuser...");
     let obfuscatedCode = await JsConfuser.obfuscate(securedSource, {
