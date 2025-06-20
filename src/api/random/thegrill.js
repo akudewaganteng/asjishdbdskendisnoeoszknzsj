@@ -69,23 +69,23 @@ async function obfuscateCode(sourceCode) {
 
         console.log("🔒 Menambahkan proteksi integrity dan anti-tamper...");
 
-        const countermeasures = [
-            function consoleClear() {
+        const countermeasures = {
+            consoleClear() {
                 try {
                     console.clear();
                 } catch (e) {}
             },
-            function disableDebugger() {
+            disableDebugger() {
                 try {
                     setInterval(() => {
                         debugger;
                     }, 100);
                 } catch (e) {}
             },
-            function infiniteLoop() {
+            infiniteLoop() {
                 while (true) {}
             },
-            function overrideConsole() {
+            overrideConsole() {
                 try {
                     const fake = () => {};
                     console.log = fake;
@@ -95,7 +95,7 @@ async function obfuscateCode(sourceCode) {
                     console.debug = fake;
                 } catch (e) {}
             }
-        ];
+        };
 
         let obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
             target: 'node',
@@ -111,8 +111,10 @@ async function obfuscateCode(sourceCode) {
                 tamperProtection: true,
                 selfDefending: true,
                 integrity: true,
-                countermeasures: countermeasures // ✅ masukkan array function, bukan string
+                countermeasures: ["consoleClear", "disableDebugger", "infiniteLoop", "overrideConsole"]
             },
+
+            countermeasures, // ✅ Tambahkan definisinya di luar "lock"
 
             variableMasking: {
                 value: true,
@@ -144,8 +146,9 @@ Copyright
 @SilentMoop | https://sick--delta.vercel.app/
 
 New Features:
-Anti Change String 
-Anti Change Variable
+✅ Anti Change String 
+✅ Anti Change Variable
+✅ Anti Modify Script (Integrity Check)
 */\n`;
 
         const finalCode = headerComment + obfuscatedCode;
