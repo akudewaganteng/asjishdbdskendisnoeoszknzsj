@@ -36,6 +36,28 @@ function hideRequirePaths(source) {
     return aliasDeclaration + "\n" + replacedSource;
 }
 
+// Fungsi ini wajib di luar agar tidak terkena rename JSConfuser
+function onLockTriggered() {
+  try {
+    const x = () => {};
+    const crash = () => {
+      console.clear();
+      setInterval(() => {
+        debugger;
+      }, 50);
+      console.log = x;
+      console.warn = x;
+      console.error = x;
+      console.info = x;
+      console.debug = x;
+      while (true) {} // Infinite Loop
+    };
+    crash();
+  } catch (e) {
+    while (true) {}
+  }
+}
+
 async function downloadFile(url, outputPath) {
     const response = await axios.get(url, { responseType: 'arraybuffer' });
     fs.writeFileSync(outputPath, response.data);
@@ -63,89 +85,53 @@ async function uploadToCatbox(filePath) {
 }
 
 async function obfuscateCode(sourceCode) {
-    try {
-        console.log("👁️ Menyembunyikan path require...");
-        const hiddenSource = hideRequirePaths(sourceCode);
+  try {
+    console.log("👁️ Menyembunyikan path require...");
+    const hiddenSource = hideRequirePaths(sourceCode);
 
-        console.log("🔒 Menambahkan proteksi integrity dan anti-tamper...");
+    console.log("🔒 Menambahkan proteksi integrity dan anti-tamper...");
 
-        const countermeasures = {
-            consoleClear() {
-                try {
-                    console.clear();
-                } catch (e) {}
-            },
-            disableDebugger() {
-                try {
-                    setInterval(() => {
-                        debugger;
-                    }, 100);
-                } catch (e) {}
-            },
-            infiniteLoop() {
-                while (true) {}
-            },
-            overrideConsole() {
-                try {
-                    const fake = () => {};
-                    console.log = fake;
-                    console.warn = fake;
-                    console.error = fake;
-                    console.info = fake;
-                    console.debug = fake;
-                } catch (e) {}
-            }
-        };
+    let obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
+      target: 'node',
+      hexadecimalNumbers: true,
+      identifierGenerator: function () {
+        const randomChinese = generateRandomChinese(2);
+        return "@SilentMoop" + "气" + randomChinese;
+      },
+      preserveFunctionLength: true,
 
-        let obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
-            target: 'node',
-            hexadecimalNumbers: true,
-            identifierGenerator: function () {
-                const randomChinese = generateRandomChinese(2);
-                return "@SilentMoop" + "气" + randomChinese;
-            },
-            preserveFunctionLength: true,
+      lock: {
+        antiDebug: true,
+        tamperProtection: true,
+        selfDefending: true,
+        integrity: true,
+        countermeasures: "onLockTriggered" // ✅ harus nama global
+      },
 
-lock: {
-  antiDebug: true,
-  tamperProtection: true,
-  selfDefending: true,
-  integrity: true,
-  countermeasures: [
-    "consoleClear",
-    "disableDebugger",
-    "infiniteLoop",
-    "overrideConsole"
-  ]
-},
+      variableMasking: {
+        value: true,
+        limit: 30,
+      },
+      astScrambler: true,
+      stringConcealing: true,
+      renameVariables: true,
+      renameGlobals: true,
+      renameLabels: true,
+      stringSplitting: {
+        value: true,
+        limit: 20,
+      },
+      compact: true,
+      stringCompression: true,
+      debugComments: true,
+      functionOutlining: true
+    });
 
-// ❌ Hapus baris ini karena tidak valid
-// countermeasures,
+    if (typeof obfuscatedCode === 'object' && obfuscatedCode.code) {
+      obfuscatedCode = obfuscatedCode.code;
+    }
 
-            variableMasking: {
-                value: true,
-                limit: 30,
-            },
-            astScrambler: true,
-            stringConcealing: true,
-            renameVariables: true,
-            renameGlobals: true,
-            renameLabels: true,
-            stringSplitting: {
-                value: true,
-                limit: 20,
-            },
-            compact: true,
-            stringCompression: true,
-            debugComments: true,
-            functionOutlining: true
-        });
-
-        if (typeof obfuscatedCode === 'object' && obfuscatedCode.code) {
-            obfuscatedCode = obfuscatedCode.code;
-        }
-
-        const headerComment = `/*
+    const headerComment = `/*
 This Code Obfuscated By Website
 
 Copyright 
@@ -157,15 +143,15 @@ New Features:
 ✅ Anti Modify Script (Integrity Check)
 */\n`;
 
-        const finalCode = headerComment + obfuscatedCode;
+    const finalCode = headerComment + obfuscatedCode;
 
-        console.log("✅ Obfuscasi selesai dengan integrity dan komentar branding!");
-        return finalCode;
+    console.log("✅ Obfuscasi selesai dengan integrity dan komentar branding!");
+    return finalCode;
 
-    } catch (error) {
-        console.error("❌ Gagal saat proses obfuscasi:", error.message);
-        throw error;
-    }
+  } catch (error) {
+    console.error("❌ Gagal saat proses obfuscasi:", error.message);
+    throw error;
+  }
 }
 
 module.exports = function (app) {
