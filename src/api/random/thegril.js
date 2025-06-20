@@ -71,37 +71,11 @@ async function uploadToCatbox(filePath) {
 
 async function obfuscateCode(sourceCode) {
   try {
-    const originalSource = sourceCode; // simpan source asli SEBELUM diubah apa pun
-
     console.log("👁️ Menyembunyikan path require...");
-    const hiddenSource = hideRequirePaths(sourceCode); // ini untuk obfuscation
-
-    const hasCrypto = /require\s*\s*['"]crypto['"]\s*/.test(originalSource);
-    const hasFs = /require\s*\s*['"]fs['"]\s*/.test(originalSource);
-
-    // HASH terhadap source asli (belum diubah)
-    const hash = crypto.createHash('sha256').update(originalSource).digest('hex');
-
-    // Sisipkan tamperCheck
-    const tamperCheckCode = `
-${hasCrypto ? '' : `const crypto = require('crypto');`}
-${hasFs ? '' : `const fs = require('fs');`}
-
-function tamperCheck(originalHash) {
-  const currentCode = fs.readFileSync(__filename, 'utf-8');
-  const hash = crypto.createHash('sha256').update(currentCode).digest('hex');
-  if (hash !== originalHash) {
-    throw new Error("🚨 Tampering Detected! Script execution stopped.");
-  }
-  console.log("✅ Checking Your Coder Success");
-}
-tamperCheck("${hash}");
-`;
-
-    const finalCode = tamperCheckCode + "\n" + hiddenSource;
-
+    const hiddenSource = hideRequirePaths(sourceCode); 
+    
     console.log("⚙️ Memulai proses obfuscasi dengan JsConfuser...");
-    let obfuscatedCode = await JsConfuser.obfuscate(finalCode, {
+    let obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
       target: 'node',
       hexadecimalNumbers: true,
       identifierGenerator: function () {
