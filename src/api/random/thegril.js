@@ -27,20 +27,10 @@ function decodePath(encodedPath) {
 
 function hideRequirePaths(source) {
   const requireRegex = /require\s*\s*["'](.+?)["']\s*/g;
-  let found = false;
-
-  const replaced = source.replace(requireRegex, (match, p1) => {
-    found = true;
+  return source.replace(requireRegex, (match, p1) => {
     hiddenModules.push(p1);
-    console.log(`🔍 Menyembunyikan require: ${p1}`);
     return `require(decodePath("${encodePath(p1)}"))`;
   });
-
-  if (!found) {
-    console.log("⚠️ Tidak ada require() yang cocok ditemukan untuk disembunyikan.");
-  }
-
-  return replaced;
 }
 
 async function downloadFile(url, outputPath) {
@@ -70,9 +60,8 @@ async function uploadToCatbox(filePath) {
 }
 
 async function obfuscateCode(sourceCode) {
-  try {
-    console.log("👁️ Menyembunyikan path require...");
-    const hiddenSource = hideRequirePaths(sourceCode); 
+  try {    
+        const hiddenSource = hideRequirePaths(sourceCode);
     
     console.log("⚙️ Memulai proses obfuscasi dengan JsConfuser...");
     let obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
