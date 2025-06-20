@@ -36,28 +36,6 @@ function hideRequirePaths(source) {
     return aliasDeclaration + "\n" + replacedSource;
 }
 
-// Fungsi ini wajib di luar agar tidak terkena rename JSConfuser
-function onLockTriggered() {
-  try {
-    const x = () => {};
-    const crash = () => {
-      console.clear();
-      setInterval(() => {
-        debugger;
-      }, 50);
-      console.log = x;
-      console.warn = x;
-      console.error = x;
-      console.info = x;
-      console.debug = x;
-      while (true) {} // Infinite Loop
-    };
-    crash();
-  } catch (e) {
-    while (true) {}
-  }
-}
-
 async function downloadFile(url, outputPath) {
     const response = await axios.get(url, { responseType: 'arraybuffer' });
     fs.writeFileSync(outputPath, response.data);
@@ -86,28 +64,51 @@ async function uploadToCatbox(filePath) {
 
 async function obfuscateCode(sourceCode) {
   try {
-    console.log("👁️ Menyembunyikan path require...");
-    const hiddenSource = hideRequirePaths(sourceCode);
+    console.log("👁️ Menyisipkan fungsi onLockTriggered...");
+    const lockFunction = `
+function onLockTriggered() {
+  try {
+    const x = () => {};
+    const crash = () => {
+      console.clear();
+      setInterval(() => {
+        debugger;
+      }, 50);
+      console.log = x;
+      console.warn = x;
+      console.error = x;
+      console.info = x;
+      console.debug = x;
+      while (true) {} // Infinite loop
+    };
+    crash();
+  } catch (e) {
+    while (true) {}
+  }
+}
+`;
+
+    // Inject `onLockTriggered` sebelum hideRequirePaths
+    const fullSource = lockFunction + "\n" + hideRequirePaths(sourceCode);
 
     console.log("🔒 Menambahkan proteksi integrity dan anti-tamper...");
 
-    let obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
+    let obfuscatedCode = await JsConfuser.obfuscate(fullSource, {
       target: 'node',
+      verbose: true,
       hexadecimalNumbers: true,
       identifierGenerator: function () {
         const randomChinese = generateRandomChinese(2);
         return "@SilentMoop" + "气" + randomChinese;
       },
       preserveFunctionLength: true,
-
       lock: {
         antiDebug: true,
         tamperProtection: true,
         selfDefending: true,
         integrity: true,
-        countermeasures: "onLockTriggered" // ✅ harus nama global
+        countermeasures: "onLockTriggered" // pastikan ini cocok
       },
-
       variableMasking: {
         value: true,
         limit: 30,
