@@ -78,18 +78,17 @@ let obfuscatedCode = await JsConfuser.obfuscate(hiddenSource, {
   preserveFunctionLength: true,
 
   lock: {
-    antiDebug: true,
-    tamperProtection: true,
-    selfDefending: true,
-    integrity: true,
-  },
-
+  antiDebug: true,
+  tamperProtection: true,
+  selfDefending: true,
+  integrity: true,
   countermeasures: [
     "consoleClear",
-    "infiniteLoop",
     "disableDebugger",
+    "infiniteLoop",
     "overrideConsole"
-  ],
+  ]
+}
 
   variableMasking: {
     value: true,
