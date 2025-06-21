@@ -97,7 +97,6 @@ module.exports = function (app) {
         name: "antiTampering",
         options: {
           maxTargetsPerFunction: 15,
-          validatedRange: -1,
           countermeasures: {
             breakApplication: true,
             realTimeNotifications: true
