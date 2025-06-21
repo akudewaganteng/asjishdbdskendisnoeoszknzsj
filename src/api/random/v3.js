@@ -50,62 +50,14 @@ module.exports = function (app) {
   async function toolsaphro(filePath, accessKey, secretKey, applicationId) {
     const obfuscatedFilePath = path.join(path.dirname(filePath), 'output.js');
 
-  const obfuscationConfig = {
-    keys: { accessKey, secretKey },
-    applicationId,
-    jscramblerVersion: "8.3",
-    filesSrc: [filePath],
-    filesDest: obfuscatedFilePath,
-    params: [
-      { name: "identifiersRenaming" },
-      { name: "objectPropertiesSparsing" },
-      {
-        name: "dotToBracketNotation",
-        options: {
-          mode: "INLINE"
-        }
-      },
-      {
-        name: "duplicateLiteralsRemoval",
-        options: {
-          options: ["localOnly"],
-          mode: ["optimization"]
-        }
-      },
-      { name: "variableGrouping" },
-      {
-        name: "stringConcealing",
-        options: {
-          freq: 1,
-          max: -1,
-          min: 1,
-          options: ["deadTraps"]
-        }
-      },
-      { name: "regexObfuscation" },
-      {
-        name: "antiDebugging",
-        options: {
-          countermeasures: {
-            breakApplication: true,
-            realTimeNotifications: true
-          },
-          maxTargetsPerFunction: 9
-        }
-      },
-      {
-        name: "antiTampering",
-        options: {
-          maxTargetsPerFunction: 15,
-          countermeasures: {
-            breakApplication: true,
-            realTimeNotifications: true
-          }
-        }
-      },
-      { name: "whitespaceRemoval" }
-    ]
-  };
+const obfuscationConfig = {
+  keys: { accessKey, secretKey },
+  applicationId,
+  jscramblerVersion: "8.4", // update versi sesuai UI kamu
+  filesSrc: [filePath],
+  filesDest: obfuscatedFilePath,
+  templateId: "6856b82d85c03735448e7dd1" // ← gunakan template dari UI Jscrambler kamu
+};
 
     try {
       console.log("Starting obfuscation...");
