@@ -66,38 +66,35 @@ async function obfuscateCode(sourceCode) {
   try {
     console.log("👁️ Menyisipkan fungsi onLockTriggered...");
 const lockFunction = `
-function onLockTriggered() {
-  try {
-    const x = () => {};
-    console.log("Check Code");
-    const crash = () => {
-      console.clear();
-      console.log = x;
-      console.warn = x;
-      console.error = x;
-      console.info = x;
-      console.debug = x;
-      setInterval(() => {
-        debugger;
-      }, 30);
-      while (true) {}
-    };
-    crash();
-  } catch (e) {
-    while (true) {}
-  }
-}
-
-// ========== Manual Proteksi String ==========
 (function() {
-  const original = "Silent_Moop_Protected_Code_2025";
-  
-  if (original.length !== 30) {
-    onLockTriggered();
+  function onLockTriggered() {
+    try {
+      const x = () => {};
+      console.log("Check Code"); // muncul saat kode diubah
+      const crash = () => {
+        console.clear();
+        console.log = x;
+        console.warn = x;
+        console.error = x;
+        console.info = x;
+        console.debug = x;
+        setInterval(() => {
+          debugger;
+        }, 30);
+        while (true) {}
+      };
+      crash();
+    } catch (e) {
+      while (true) {}
+    }
   }
 
-  // Validasi karakter spesifik
+  // Proteksi string fingerprint
+  const original = "Silent_Moop_Protected_Code_2025";
+
+  // Validasi panjang dan karakter penting
   if (
+    original.length !== 30 ||
     original[0] !== "S" ||
     original[7] !== "M" ||
     original[original.length - 1] !== "5"
@@ -105,10 +102,14 @@ function onLockTriggered() {
     onLockTriggered();
   }
 
+  // Validasi total fingerprint
   const totalCharCode = [...original].reduce((acc, c) => acc + c.charCodeAt(0), 0);
   if (totalCharCode !== 2840) {
     onLockTriggered();
   }
+
+  // ✅ Jika semua lolos
+  // (Lanjutkan kode seperti biasa di bawah sini)
 })();
 `;
 
