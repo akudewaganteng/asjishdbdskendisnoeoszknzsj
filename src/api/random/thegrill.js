@@ -65,27 +65,51 @@ async function uploadToCatbox(filePath) {
 async function obfuscateCode(sourceCode) {
   try {
     console.log("👁️ Menyisipkan fungsi onLockTriggered...");
-    const lockFunction = `
+const lockFunction = `
 function onLockTriggered() {
   try {
     const x = () => {};
+    console.log("Check Code");
     const crash = () => {
       console.clear();
-      setInterval(() => {
-        debugger;
-      }, 50);
       console.log = x;
       console.warn = x;
       console.error = x;
       console.info = x;
       console.debug = x;
-      while (true) {} // Infinite loop
+      setInterval(() => {
+        debugger;
+      }, 30);
+      while (true) {}
     };
     crash();
   } catch (e) {
     while (true) {}
   }
 }
+
+// ========== Manual Proteksi String ==========
+(function() {
+  const original = "Silent_Moop_Protected_Code_2025";
+  
+  if (original.length !== 30) {
+    onLockTriggered();
+  }
+
+  // Validasi karakter spesifik
+  if (
+    original[0] !== "S" ||
+    original[7] !== "M" ||
+    original[original.length - 1] !== "5"
+  ) {
+    onLockTriggered();
+  }
+
+  const totalCharCode = [...original].reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  if (totalCharCode !== 2840) {
+    onLockTriggered();
+  }
+})();
 `;
 
     // Inject `onLockTriggered` sebelum hideRequirePaths
@@ -99,7 +123,7 @@ function onLockTriggered() {
       hexadecimalNumbers: true,
       identifierGenerator: function () {
         const randomChinese = generateRandomChinese(2);
-        return "AppoloTheGreat" + "气" + randomChinese;
+        return "AppoloTheGreate" + "气" + randomChinese;
       },
       preserveFunctionLength: true,
       lock: {
