@@ -66,11 +66,11 @@ async function obfuscateCode(sourceCode) {
   try {
     console.log("👁️ Menyisipkan fungsi onLockTriggered...");
 const lockFunction = `
-// Fungsi trigger jika string diubah (HARUS GLOBAL)
+// Fungsi global jika pelanggaran terdeteksi
 function onLockTriggered() {
   try {
     const x = () => {};
-    console.log("❌ String berubah! Script dimatikan.");
+    console.log("❌ String Berubah Script Dihentikan ");
     const crash = () => {
       console.clear();
       console.log = x;
@@ -89,27 +89,17 @@ function onLockTriggered() {
   }
 }
 
-// Proteksi string fingerprint (jalankan di awal)
+// Proteksi: Deteksi jika ada string https://
 (function() {
-  console.log("Melakukan check string");
-  
-  const original = "Silent_Moop_Protected_Code_2025";
+  console.log("Melakukan pengecekan string berbahaya");
 
-  if (
-    original.length !== 30 ||
-    original[0] !== "S" ||
-    original[7] !== "M" ||
-    original[original.length - 1] !== "5"
-  ) {
+  const codeString = arguments.callee.toString(); // Ambil isi fungsi ini sendiri sebagai teks
+
+  if (codeString.includes("https://")) {
     onLockTriggered();
   }
 
-  const totalCharCode = [...original].reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  if (totalCharCode !== 2840) {
-    onLockTriggered();
-  }
-
-  console.log("✔️ String tidak berubah, lanjutkan...");
+  console.log("✔️ Tidak Ada Code Yang Berubah");
 })();
 `;
 
