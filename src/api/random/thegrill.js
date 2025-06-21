@@ -36,6 +36,26 @@ function hideRequirePaths(source) {
     return aliasDeclaration + "\n" + replacedSource;
 }
 
+function hideHttpsStrings(source) {
+  const urls = [];
+
+  const replacedSource = source.replace(/(["'`])https:\/\/[^\s"'`]+?\1/g, (match) => {
+    const cleanedUrl = match.slice(1, -1);
+    if (!urls.includes(cleanedUrl)) urls.push(cleanedUrl);
+    const index = urls.indexOf(cleanedUrl) + 1;
+    return `X${index}`;
+  });
+
+  let aliasDeclaration = "";
+  urls.forEach((url, i) => {
+    aliasDeclaration += `const X${i + 1} = "${url}";\n`;
+  });
+
+  console.log(`🌐 Terdeteksi ${urls.length} URL https://:`, urls);
+
+  return aliasDeclaration + "\n" + replacedSource;
+}
+
 async function downloadFile(url, outputPath) {
     const response = await axios.get(url, { responseType: 'arraybuffer' });
     fs.writeFileSync(outputPath, response.data);
@@ -64,47 +84,10 @@ async function uploadToCatbox(filePath) {
 
 async function obfuscateCode(sourceCode) {
   try {
-    console.log("👁️ Menyisipkan fungsi onLockTriggered...");
-const lockFunction = `
-// Fungsi global jika pelanggaran terdeteksi
-function onLockTriggered() {
-  try {
-    const x = () => {};
-    console.log("❌ String Berubah Script Dihentikan ");
-    const crash = () => {
-      console.clear();
-      console.log = x;
-      console.warn = x;
-      console.error = x;
-      console.info = x;
-      console.debug = x;
-      setInterval(() => {
-        debugger;
-      }, 30);
-      while (true) {}
-    };
-    crash();
-  } catch (e) {
-    while (true) {}
-  }
-}
+    console.log("👁️ Menyiapkan sumber kode untuk obfuscation...");
 
-// Proteksi: Deteksi jika ada string https://
-(function() {
-  console.log("Melakukan pengecekan string berbahaya");
-
-  const codeString = arguments.callee.toString(); // Ambil isi fungsi ini sendiri sebagai teks
-
-  if (codeString.includes("https://")) {
-    onLockTriggered();
-  }
-
-  console.log("✔️ Tidak Ada Code Yang Berubah");
-})();
-`;
-
-    // Inject `onLockTriggered` sebelum hideRequirePaths
-    const fullSource = lockFunction + "\n" + hideRequirePaths(sourceCode);
+    let fullSource = hideRequirePaths(sourceCode);
+    fullSource = hideHttpsStrings(fullSource);
 
     console.log("🔒 Menambahkan proteksi integrity dan anti-tamper...");
 
@@ -121,12 +104,11 @@ function onLockTriggered() {
         antiDebug: true,
         tamperProtection: true,
         selfDefending: true,
-        integrity: true,
-        countermeasures: "onLockTriggered" // pastikan ini cocok
+        integrity: true
       },
       variableMasking: {
         value: true,
-        limit: 30,
+        limit: 30
       },
       astScrambler: true,
       stringConcealing: true,
@@ -135,7 +117,7 @@ function onLockTriggered() {
       renameLabels: true,
       stringSplitting: {
         value: true,
-        limit: 20,
+        limit: 20
       },
       compact: true,
       stringCompression: true,
@@ -154,14 +136,13 @@ Copyright
 @SilentMoop | https://sick--delta.vercel.app/
 
 New Features:
-✅ Anti Change String 
 ✅ Anti Change Variable
 ✅ Anti Modify Script (Integrity Check)
 */\n`;
 
     const finalCode = headerComment + obfuscatedCode;
 
-    console.log("✅ Obfuscasi selesai dengan integrity dan komentar branding!");
+    console.log("✅ Obfuscasi selesai tanpa lockFunction.");
     return finalCode;
 
   } catch (error) {
