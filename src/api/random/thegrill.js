@@ -89,7 +89,9 @@ async function obfuscateCode(sourceCode) {
 
       identifierGenerator: {
         zeroWidth: 0.50,
-        mangled: 0.40
+        mangled: 0.40,
+        randomized: 0.50,
+        number: 0.20
       },
 
       preserveFunctionLength: true,
