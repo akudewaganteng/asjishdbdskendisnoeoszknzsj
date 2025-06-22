@@ -5,6 +5,7 @@ const FormData = require('form-data');
 const JsConfuser = require('js-confuser');
 const crypto = require('crypto');
 const config = require('../settings');
+const crypto = require('crypto');
 
 const hiddenModules = [];
 
@@ -27,6 +28,55 @@ function hideRequirePaths(source) {
     return aliasDeclaration + "\n" + replacedSource;
 }
 
+function addIntegrityProtection(code) {
+  const requiredModules = {
+    fs: /require\s*\s*['"]fs['"]\s*/.test(code),
+    path: /require\s*\s*['"]path['"]\s*/.test(code),
+    crypto: /require\s*\s*['"]crypto['"]\s*/.test(code),
+  };
+
+  const requires = [];
+  if (!requiredModules.fs) requires.push(`const fs = require('fs');`);
+  if (!requiredModules.path) requires.push(`const path = require('path');`);
+  if (!requiredModules.crypto) requires.push(`const crypto = require('crypto');`);
+
+  const checker = `
+/*🛡️ Integrity Checker*/
+(function(){
+  ${requires.join('\n')}
+
+  const file = __filename;
+  let content = fs.readFileSync(file, 'utf-8');
+
+  const declaredHash = (content.match(/\\/\\/INTEGRITY_HASH:([a-f0-9]+)/) || [])[1];
+  const cleaned = content.replace(/\\/\\/INTEGRITY_HASH:[a-f0-9]+/, '');
+
+  const calculatedHash = crypto.createHash('sha256').update(cleaned).digest('hex');
+
+  const integrityPath = path.join(__dirname, '.appolo_integrity');
+  let count = 0;
+  if (fs.existsSync(integrityPath)) {
+    count = parseInt(fs.readFileSync(integrityPath, 'utf-8') || '0');
+  }
+
+  if (declaredHash && declaredHash !== calculatedHash) {
+    count++;
+    fs.writeFileSync(integrityPath, count.toString());
+    if (count > 1) {
+      console.error("❌ Integrity error: File telah dimodifikasi lebih dari satu kali.");
+      process.exit(1);
+    } else {
+      console.warn("⚠️ Perubahan pertama terdeteksi. Masih diizinkan.");
+      console.log("✅ Success checking: Running Script...");
+    }
+  }
+})();
+`;
+
+  const finalCode = `${checker}\n\n${code}`;
+  const hash = crypto.createHash('sha256').update(finalCode).digest('hex');
+  return `${finalCode}\n\n//INTEGRITY_HASH:${hash}`;
+}
 function hideHttpsStrings(source) {
   const urls = [];
 
@@ -77,7 +127,11 @@ async function obfuscateCode(sourceCode) {
   try {
     console.log("👁️ Menyiapkan sumber kode untuk obfuscation...");
 
-    const fullSource1 = hideRequirePaths(sourceCode);
+    // 🔐 Tambahkan proteksi hash sebelum manipulasi apapun
+    const sourceWithIntegrity = addIntegrityProtection(sourceCode);
+
+    // 🕵️‍♂️ Baru lakukan hide require dan hide https
+    const fullSource1 = hideRequirePaths(sourceWithIntegrity);
     const fullSource = hideHttpsStrings(fullSource1);
 
     console.log("🔒 Menambahkan proteksi integrity dan anti-tamper...");
@@ -90,8 +144,7 @@ async function obfuscateCode(sourceCode) {
       identifierGenerator: {
         zeroWidth: 0.50,
         mangled: 0.40,
-        randomized: 0.50,
-        number: 0.20
+        randomized: 0.20
       },
 
       preserveFunctionLength: true,
@@ -142,7 +195,7 @@ New Features:
 
     const finalCode = headerComment + code;
 
-    console.log("✅ Obfuscasi selesai tanpa lockFunction.");
+    console.log("✅ Obfuscasi selesai dengan proteksi integrity di awal.");
     return finalCode;
 
   } catch (error) {
