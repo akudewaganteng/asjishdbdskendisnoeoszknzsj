@@ -144,7 +144,6 @@ New Features:
     throw error;
   }
 }
-}
 
 module.exports = function (app) {
     app.get('/api/pathketutup', async (req, res) => {
