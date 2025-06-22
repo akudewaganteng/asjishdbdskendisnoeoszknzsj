@@ -86,10 +86,11 @@ async function obfuscateCode(sourceCode) {
       target: 'node',
       verbose: true,
       hexadecimalNumbers: true,
-identifierGenerator: {
+      identifierGenerator: function () {
 zeroWidth: 0.50,
-mangled: 0.43,
-}
+mangled: 0.30,
+randomized: 0.50
+      },
       preserveFunctionLength: true,
       lock: {
         antiDebug: true,
