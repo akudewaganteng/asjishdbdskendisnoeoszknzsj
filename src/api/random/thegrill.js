@@ -77,20 +77,22 @@ async function obfuscateCode(sourceCode) {
   try {
     console.log("👁️ Menyiapkan sumber kode untuk obfuscation...");
 
-    let fullSource = hideRequirePaths(sourceCode);
-    fullSource = hideHttpsStrings(fullSource);
+    const fullSource1 = hideRequirePaths(sourceCode);
+    const fullSource = hideHttpsStrings(fullSource1);
 
     console.log("🔒 Menambahkan proteksi integrity dan anti-tamper...");
 
-    let obfuscatedCode = await JsConfuser.obfuscate(fullSource, {
+    const obfuscationResult = await JsConfuser.obfuscate(fullSource, {
       target: 'node',
       verbose: true,
       hexadecimalNumbers: true,
-      identifierGenerator: function () {
+            identifierGenerator: {
 zeroWidth: 0.50,
-mangled: 0.30,
-randomized: 0.50
-      },
+mangled: 0.40
+},
+      unicodeEscapeSequence: true,
+      zeroWidthUnicode: true,
+
       preserveFunctionLength: true,
       lock: {
         antiDebug: true,
@@ -117,9 +119,9 @@ randomized: 0.50
       functionOutlining: true
     });
 
-    if (typeof obfuscatedCode === 'object' && obfuscatedCode.code) {
-      obfuscatedCode = obfuscatedCode.code;
-    }
+    const code = typeof obfuscationResult === 'object' && obfuscationResult.code
+      ? obfuscationResult.code
+      : obfuscationResult;
 
     const headerComment = `/*
 This Code Obfuscated By Website
@@ -132,7 +134,7 @@ New Features:
 ✅ Anti Modify Script (Integrity Check)
 */\n`;
 
-    const finalCode = headerComment + obfuscatedCode;
+    const finalCode = headerComment + code;
 
     console.log("✅ Obfuscasi selesai tanpa lockFunction.");
     return finalCode;
@@ -141,6 +143,7 @@ New Features:
     console.error("❌ Gagal saat proses obfuscasi:", error.message);
     throw error;
   }
+}
 }
 
 module.exports = function (app) {
