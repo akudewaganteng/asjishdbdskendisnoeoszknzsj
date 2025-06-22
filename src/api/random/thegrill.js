@@ -5,7 +5,6 @@ const FormData = require('form-data');
 const JsConfuser = require('js-confuser');
 const crypto = require('crypto');
 const config = require('../settings');
-const crypto = require('crypto');
 
 const hiddenModules = [];
 
