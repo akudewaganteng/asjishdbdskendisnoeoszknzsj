@@ -8,15 +8,6 @@ const config = require('../settings');
 
 const hiddenModules = [];
 
-function generateRandomChinese(length) {
-    const chineseChars = "你好世界爱和平成功智慧力量快乐梦想";
-    let result = "";
-    for (let i = 0; i < length; i++) {
-        result += chineseChars.charAt(Math.floor(Math.random() * chineseChars.length));
-    }
-    return result;
-}
-
 function hideRequirePaths(source) {
     const modules = [];
 
@@ -95,10 +86,10 @@ async function obfuscateCode(sourceCode) {
       target: 'node',
       verbose: true,
       hexadecimalNumbers: true,
-      identifierGenerator: function () {
-        const randomChinese = generateRandomChinese(2);
-        return "AppoloTheGreate" + "气" + randomChinese;
-      },
+identifierGenerator: {
+zeroWidth: 0.50,
+mangled: 0.43,
+}
       preserveFunctionLength: true,
       lock: {
         antiDebug: true,
