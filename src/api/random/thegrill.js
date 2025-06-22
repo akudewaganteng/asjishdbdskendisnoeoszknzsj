@@ -86,33 +86,37 @@ async function obfuscateCode(sourceCode) {
       target: 'node',
       verbose: true,
       hexadecimalNumbers: true,
-            identifierGenerator: {
-zeroWidth: 0.50,
-mangled: 0.40
-},
-      unicodeEscapeSequence: true,
-      zeroWidthUnicode: true,
+
+      identifierGenerator: {
+        zeroWidth: 0.50,
+        mangled: 0.40
+      },
 
       preserveFunctionLength: true,
+
       lock: {
         antiDebug: true,
         tamperProtection: true,
         selfDefending: true,
         integrity: true
       },
+
       variableMasking: {
         value: true,
         limit: 30
       },
+
       astScrambler: true,
       stringConcealing: true,
       renameVariables: true,
       renameGlobals: true,
       renameLabels: true,
+
       stringSplitting: {
         value: true,
         limit: 20
       },
+
       compact: true,
       stringCompression: true,
       debugComments: true,
