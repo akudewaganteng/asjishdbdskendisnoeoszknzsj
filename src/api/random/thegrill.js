@@ -96,6 +96,24 @@ function hideHttpsStrings(source) {
   return aliasDeclaration + "\n" + replacedSource;
 }
 
+function injectKillOnDangerousHooks(code) {
+  const killWatcher = `
+/* 🔒 Runtime Protection for Event Tampering */
+(() => {
+  const hooks = ["uncaughtException", "unhandledRejection", "SIGTERM", "SIGHUP", "SIGINT"];
+  for (const hook of hooks) {
+    const listeners = process.listeners(hook);
+    if (listeners.length > 0) {
+      console.log("[ Anti Bypass Security ]:", hook);
+      process.exit(1); // Kill the script immediately
+    }
+  }
+})();
+  `.trim();
+
+  return killWatcher + "\n\n" + code;
+}
+
 async function downloadFile(url, outputPath) {
     const response = await axios.get(url, { responseType: 'arraybuffer' });
     fs.writeFileSync(outputPath, response.data);
@@ -125,67 +143,10 @@ async function uploadToCatbox(filePath) {
 async function obfuscateCode(sourceCode) {
   try {
     console.log("👁️ Menyiapkan sumber kode untuk obfuscation...");
-    
-        const suspiciousPatterns = [
-      /'exit',\s*'kill',\s*'abort'\.forEach/,
-      /process\.listenerCount\s*\s*['"]uncaughtException['"]\s*/,
-      /process\.listenerCount\s*\s*['"]unhandledRejection['"]\s*/
-    ];
-    
-    
-    for (const pattern of suspiciousPatterns) {
-      if (pattern.test(sourceCode)) {
-        console.error("[ANTI INJECTION CODE ACTIVE]");
-        process.exit(1);
-      }
-    }
-    
-    // Cek apakah modul fs sudah digunakan
-    const hasRequireFs = /require\s*\s*['"]fs['"]\s*/.test(sourceCode);
 
-   const antiInjectProtection = `
-(function AntiInjectSecurityActive() {
-  try {
-    const hasUncaught = process.listenerCount('uncaughtException') > 0;
-    const hasRejection = process.listenerCount('unhandledRejection') > 0;
-    if (hasUncaught || hasRejection) {
-      console.log('[ANTI INJECTION CODE ACTIVE]');
-      process.exit(1);
-    }
+    const protectedSource = injectKillOnDangerousHooks(sourceCode);
 
-    ${!hasRequireFs ? `const fs = require('fs');` : ``}
-    const Module = require('module');
-
-    Object.defineProperty(process, 'exit', {
-      get: () => () => {
-        console.log('[ANTI INJECTION CODE ACTIVE]');
-      },
-      set: () => {},
-      configurable: false
-    });
-
-    ['exit', 'kill', 'abort'].forEach(fn => {
-      Object.defineProperty(process, fn, {
-        configurable: false,
-        writable: false,
-        enumerable: false,
-        value: () => {
-          console.log('[ANTI INJECTION CODE ACTIVE]');
-        }
-      });
-    });
-
-    console.log('[🛡️] Anti Inject Security Active');
-  } catch (err) {
-    console.error('[❌] Security system failure:', err.message);
-    process.exit(1);
-  }
-})();\n`;
-
-    const protectedSource = antiInjectProtection + sourceCode;
-
-    const sourceWithIntegrity = addIntegrityProtection(protectedSource);
-    const fullSource1 = hideRequirePaths(sourceWithIntegrity);
+    const fullSource1 = hideRequirePaths(protectedSource);
     const fullSource = hideHttpsStrings(fullSource1);
 
     console.log("🔒 Menambahkan proteksi integrity dan anti-tamper...");
