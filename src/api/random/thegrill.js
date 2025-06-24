@@ -126,10 +126,62 @@ async function obfuscateCode(sourceCode) {
   try {
     console.log("👁️ Menyiapkan sumber kode untuk obfuscation...");
 
-    // 🔐 Tambahkan proteksi hash sebelum manipulasi apapun
-    const sourceWithIntegrity = addIntegrityProtection(sourceCode);
+    const antiInjectProtection = `
+(function AntiInjectSecurityActive() {
+  try {
+    const fs = require('fs');
+    const Module = require('module');
 
-    // 🕵️‍♂️ Baru lakukan hide require dan hide https
+    const originalRequire = Module.prototype.require;
+
+    const detectInjected = () => {
+      const stack = new Error().stack || '';
+      return stack.includes('eval') || stack.includes('Function') || stack.includes('<anonymous>');
+    };
+
+    if (detectInjected()) {
+      console.log('[❌] Inject Detected. Shutting down immediately...');
+      process.exit(1);
+    }
+
+    Object.defineProperty(process, 'exit', {
+      get: () => () => {
+        console.log('[🔒] process.exit diblokir!');
+      },
+      set: () => {},
+      configurable: false
+    });
+
+    ['exit', 'kill', 'abort'].forEach(fn => {
+      process[fn] = () => {
+        console.log('[🔒] process.' + fn + '() diblokir!');
+      };
+    });
+
+    Module.prototype.require = function (mod) {
+      if (mod === 'child_process') {
+        console.log('[🚫] Akses ke child_process diblokir!');
+        return () => {
+          throw new Error('[Blocked] child_process tidak diizinkan');
+        };
+      }
+      return originalRequire.apply(this, arguments);
+    };
+
+    Object.freeze(Module.prototype.require);
+    Object.freeze(process);
+
+    console.log('[🛡️] Anti Inject Security Active');
+
+  } catch (err) {
+    console.error('[❌] Security system failure:', err.message);
+    process.exit(1);
+  }
+})();\n`;
+
+    const protectedSource = antiInjectProtection + sourceCode;
+
+    const sourceWithIntegrity = addIntegrityProtection(protectedSource);
     const fullSource1 = hideRequirePaths(sourceWithIntegrity);
     const fullSource = hideHttpsStrings(fullSource1);
 
@@ -190,11 +242,12 @@ Copyright
 New Features:
 ✅ Anti Change Variable
 ✅ Anti Modify Script (Integrity Check)
+✅ Anti Inject Security Active
 */\n`;
 
     const finalCode = headerComment + code;
 
-    console.log("✅ Obfuscasi selesai dengan proteksi integrity di awal.");
+    console.log("✅ Obfuscasi selesai dengan proteksi integrity dan anti inject.");
     return finalCode;
 
   } catch (error) {
