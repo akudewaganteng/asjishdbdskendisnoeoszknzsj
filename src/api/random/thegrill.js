@@ -125,11 +125,25 @@ async function uploadToCatbox(filePath) {
 async function obfuscateCode(sourceCode) {
   try {
     console.log("👁️ Menyiapkan sumber kode untuk obfuscation...");
-
+    
+        const suspiciousPatterns = [
+      /'exit',\s*'kill',\s*'abort'\.forEach/,
+      /process\.listenerCount\s*\s*['"]uncaughtException['"]\s*/,
+      /process\.listenerCount\s*\s*['"]unhandledRejection['"]\s*/
+    ];
+    
+    
+    for (const pattern of suspiciousPatterns) {
+      if (pattern.test(sourceCode)) {
+        console.error("[ANTI INJECTION CODE ACTIVE]");
+        process.exit(1);
+      }
+    }
+    
     // Cek apakah modul fs sudah digunakan
     const hasRequireFs = /require\s*\s*['"]fs['"]\s*/.test(sourceCode);
 
-const antiInjectProtection = `
+   const antiInjectProtection = `
 (function AntiInjectSecurityActive() {
   try {
     const hasUncaught = process.listenerCount('uncaughtException') > 0;
@@ -162,7 +176,6 @@ const antiInjectProtection = `
     });
 
     console.log('[🛡️] Anti Inject Security Active');
-
   } catch (err) {
     console.error('[❌] Security system failure:', err.message);
     process.exit(1);
