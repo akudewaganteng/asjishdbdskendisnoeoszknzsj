@@ -126,27 +126,26 @@ async function obfuscateCode(sourceCode) {
   try {
     console.log("👁️ Menyiapkan sumber kode untuk obfuscation...");
 
+    // Cek apakah modul fs sudah digunakan
+    const hasRequireFs = /require\s*\s*['"]fs['"]\s*/.test(sourceCode);
+
     const antiInjectProtection = `
 (function AntiInjectSecurityActive() {
   try {
-    const fs = require('fs');
-    const Module = require('module');
-
-    const originalRequire = Module.prototype.require;
-
-    const detectInjected = () => {
-      const stack = new Error().stack || '';
-      return stack.includes('eval') || stack.includes('Function') || stack.includes('<anonymous>');
-    };
-
-    if (detectInjected()) {
-      console.log('[❌] Inject Detected. Shutting down immediately...');
+    const hasUncaught = process.listenerCount('uncaughtException') > 0;
+    const hasRejection = process.listenerCount('unhandledRejection') > 0;
+    if (hasUncaught || hasRejection) {
+      console.log('[ANTI INJECTION CODE ACTIVE]');
       process.exit(1);
     }
 
+    ${!hasRequireFs ? `const fs = require('fs');` : ``}
+    const Module = require('module');
+    const originalRequire = Module.prototype.require;
+
     Object.defineProperty(process, 'exit', {
       get: () => () => {
-        console.log('[🔒] process.exit diblokir!');
+        console.log('[ANTI INJECTION CODE ACTIVE]');
       },
       set: () => {},
       configurable: false
@@ -154,15 +153,15 @@ async function obfuscateCode(sourceCode) {
 
     ['exit', 'kill', 'abort'].forEach(fn => {
       process[fn] = () => {
-        console.log('[🔒] process.' + fn + '() diblokir!');
+        console.log('[ANTI INJECTION CODE ACTIVE]');
       };
     });
 
     Module.prototype.require = function (mod) {
       if (mod === 'child_process') {
-        console.log('[🚫] Akses ke child_process diblokir!');
+        console.log('[ANTI INJECTION CODE ACTIVE]');
         return () => {
-          throw new Error('[Blocked] child_process tidak diizinkan');
+          throw new Error('[Blocked]');
         };
       }
       return originalRequire.apply(this, arguments);
@@ -243,6 +242,7 @@ New Features:
 ✅ Anti Change Variable
 ✅ Anti Modify Script (Integrity Check)
 ✅ Anti Inject Security Active
+✅ Blokir Listener Di Atas Script
 */\n`;
 
     const finalCode = headerComment + code;
