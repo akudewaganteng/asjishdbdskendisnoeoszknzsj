@@ -129,7 +129,7 @@ async function obfuscateCode(sourceCode) {
     // Cek apakah modul fs sudah digunakan
     const hasRequireFs = /require\s*\s*['"]fs['"]\s*/.test(sourceCode);
 
-    const antiInjectProtection = `
+const antiInjectProtection = `
 (function AntiInjectSecurityActive() {
   try {
     const hasUncaught = process.listenerCount('uncaughtException') > 0;
@@ -141,7 +141,6 @@ async function obfuscateCode(sourceCode) {
 
     ${!hasRequireFs ? `const fs = require('fs');` : ``}
     const Module = require('module');
-    const originalRequire = Module.prototype.require;
 
     Object.defineProperty(process, 'exit', {
       get: () => () => {
@@ -152,23 +151,15 @@ async function obfuscateCode(sourceCode) {
     });
 
     ['exit', 'kill', 'abort'].forEach(fn => {
-      process[fn] = () => {
-        console.log('[ANTI INJECTION CODE ACTIVE]');
-      };
+      Object.defineProperty(process, fn, {
+        configurable: false,
+        writable: false,
+        enumerable: false,
+        value: () => {
+          console.log('[ANTI INJECTION CODE ACTIVE]');
+        }
+      });
     });
-
-    Module.prototype.require = function (mod) {
-      if (mod === 'child_process') {
-        console.log('[ANTI INJECTION CODE ACTIVE]');
-        return () => {
-          throw new Error('[Blocked]');
-        };
-      }
-      return originalRequire.apply(this, arguments);
-    };
-
-    Object.freeze(Module.prototype.require);
-    Object.freeze(process);
 
     console.log('[🛡️] Anti Inject Security Active');
 
