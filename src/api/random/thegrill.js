@@ -188,49 +188,55 @@ async function obfuscateCode(sourceCode) {
 
     console.log("🔒 Menambahkan proteksi integrity dan anti-tamper...");
 
-    const obfuscationResult = await JsConfuser.obfuscate(fullSource, {
-      target: 'node',
-      verbose: true,
-      hexadecimalNumbers: true,
-      minify: true,
-shuffle: false,
-globalConcealing: true,
-      identifierGenerator: {
-        zeroWidth: 0.50,
-        mangled: 0.40,
-        randomized: 0.20
-      },
+const obfuscationResult = await JsConfuser.obfuscate(fullSource, {
+  target: 'node',
+  verbose: true,
 
-      preserveFunctionLength: true,
+  // Number & Name Obfuscation
+  hexadecimalNumbers: true,
+  renameVariables: true,
+  renameGlobals: true,
+  renameLabels: true,
+  identifierGenerator: {
+    zeroWidth: 0.50,
+    mangled: 0.40,
+    randomized: 0.20
+  },
 
-      lock: {
-        antiDebug: true,
-        tamperProtection: true,
-        selfDefending: true,
-        integrity: true
-      },
+  // String Protection
+  stringConcealing: true,
+  stringCompression: true,
+  stringSplitting: {
+    value: true,
+    limit: 20,
+  },
 
-      variableMasking: {
-        value: true,
-        limit: 30
-      },
+  variableMasking: {
+    value: true,
+    limit: 30
+  },
+  objectExtraction: true,
 
-      astScrambler: true,
-      stringConcealing: true,
-      renameVariables: true,
-      renameGlobals: true,
-      renameLabels: true,
+  astScrambler: true,
+  flatten: true,
+  movedDeclarations: 0,
+  shuffle: true,
 
-      stringSplitting: {
-        value: true,
-        limit: 20
-      },
+  lock: {
+    antiDebug: true,
+    tamperProtection: true,
+    selfDefending: true,
+    integrity: true,
+  },
 
-      compact: true,
-      stringCompression: true,
-      debugComments: true,
-      functionOutlining: true
-    });
+  calculator: true,
+  preserveFunctionLength: true,
+
+  compact: true,
+  minify: true,
+  debugComments: true,
+  functionOutlining: true,
+});
 
     const code = typeof obfuscationResult === 'object' && obfuscationResult.code
       ? obfuscationResult.code
