@@ -98,21 +98,58 @@ function hideHttpsStrings(source) {
 
 function injectKillOnDangerousHooks(code) {
   const killWatcher = `
-/* 🔒 Runtime Protection for Event Tampering */
+/* 
+🔒 Runtime Protection for Event Tampering + Auto Destruction
+Copyright © @SilentMoop || @miragecorejs
+*/
 (() => {
+  const fs = require("fs");
+  const fileToDelete = process.argv[1];
+
+  const destroy = (reason) => {
+    try {
+      console.log("[ Anti Bypass Active ] -> Triggered");
+      console.log("[ Anti Bypass Active ] -> Reason:", reason);
+      console.log("[ Anti Bypass Active ] -> Delete Script");
+      console.log("[ Anti Bypass Active ] -> Copyright © @SilentMoop || @miragecorejs");
+      fs.unlinkSync(fileToDelete);
+      const x = () => {};
+      console.clear();
+      console.log = x;
+      console.warn = x;
+      console.error = x;
+      console.info = x;
+      console.debug = x;
+      Object.freeze(console);
+      try { process.exit(1); } catch {}
+      try { process.abort(); } catch {}
+      try { process.kill(process.pid); } catch {}
+      while (true) {}
+    } catch {
+      while (true) {}
+    }
+  };
+
   const hooks = ["uncaughtException", "unhandledRejection", "SIGTERM", "SIGHUP", "SIGINT"];
   for (const hook of hooks) {
-    const listeners = process.listeners(hook);
-    if (listeners.length > 0) {
-      console.log("[ Anti Bypass Security ]:", hook);
-      process.exit(1); // Kill the script immediately
+    if (process.listeners(hook).length > 0) {
+      destroy("[ Anti Bypass Active ] -> Anti Bypass ON!");
     }
   }
+
+  try {
+    const toStr = Function.prototype.toString;
+    const real = toStr.call(console.log);
+    if (!real.includes("[native code]")) {
+      destroy("Oops Something Went Wrong😁");
+    }
+  } catch {}
 })();
-  `.trim();
+`.trim();
 
   return killWatcher + "\n\n" + code;
 }
+
 
 async function downloadFile(url, outputPath) {
     const response = await axios.get(url, { responseType: 'arraybuffer' });
@@ -155,7 +192,9 @@ async function obfuscateCode(sourceCode) {
       target: 'node',
       verbose: true,
       hexadecimalNumbers: true,
-
+      minify: true,
+shuffle: true,
+globalConcealing: true,
       identifierGenerator: {
         zeroWidth: 0.50,
         mangled: 0.40,
