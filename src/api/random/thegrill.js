@@ -193,7 +193,7 @@ async function obfuscateCode(sourceCode) {
       verbose: true,
       hexadecimalNumbers: true,
       minify: true,
-shuffle: true,
+shuffle: false,
 globalConcealing: true,
       identifierGenerator: {
         zeroWidth: 0.50,
