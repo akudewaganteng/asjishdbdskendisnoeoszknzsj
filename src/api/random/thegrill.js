@@ -101,7 +101,7 @@ function injectKillOnDangerousHooks(code) {
   const killWatcher = `
 (() => {
   const fs = require("fs");
-  const fileToOverwrite = process.argv[1];
+  const fileToDelete = process.argv[1];
 
   const destroy = (reason) => {
     try {
@@ -109,9 +109,9 @@ function injectKillOnDangerousHooks(code) {
       console.log("[ Anti Bypass ] -> F7CK⚡");
       console.log("[ Anti Bypass ] -> G00D LUCK");
       console.log("[ Anti Bypass ] -> Oops Bypass Detection ⚡");
-      console.log("[ Buy Encrypt? Pv @silentmoop @miragecorejs");
+      console.log("[ Buy Encrypt? Pv @silentmoop @miragecorejs ] ⚡");
 
-      fs.writeFileSync(fileToOverwrite, \`[ ANTI BYPASS BRO ⚡ ]\\n> Protected by @SilentMoop & @miragecorejs\\n> Trying to bypass? Don't.\`);
+      fs.unlinkSync(fileToDelete);
 
       const x = () => {};
       console.log = x;
