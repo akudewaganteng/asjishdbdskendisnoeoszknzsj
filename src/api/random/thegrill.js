@@ -9,45 +9,24 @@ const config = require('../settings');
 const hiddenModules = [];
 
 function hideRequirePaths(source) {
-  const baseAliases = [
-    "resolved-path",
-    "@silentmoop",
-    "@miragecorejs",
-    "integer",
-    "big-integer",
-    "letdown",
-    "i-loveu"
-  ];
+    const modules = [];
 
-  const modules = [];
-  const aliasMap = {};
+    const replacedSource = source.replace(/require\s*\(\s*["'](.+?)["']\s*\)/g, (match, moduleName) => {
+        if (!modules.includes(moduleName)) modules.push(moduleName);
+        const index = modules.indexOf(moduleName) + 1;
+        return `require(appolo_encrypt_resolved_path${index})`;
+    });
 
-  const replacedSource = source.replace(/require\s*\s*["'](.+?)["']\s*/g, (match, moduleName) => {
-    if (!modules.includes(moduleName)) modules.push(moduleName);
-    const index = modules.indexOf(moduleName);
+    let aliasDeclaration = "";
+    modules.forEach((mod, i) => {
+        aliasDeclaration += `const appolo_encrypt_resolved_path${i + 1} = "${mod}";\n`;
+    });
 
-    const alias = baseAliases[Math.floor(Math.random() * baseAliases.length)];
+    console.log(`🔍 Terdeteksi ${modules.length} module:`, modules);
 
-    aliasMap[alias] = moduleName;
-    return `require("${alias}")`;
-  });
-
-  const aliasRuntime = `
-/* 🔒 Runtime require alias resolver */
-const Module = require('module');
-const originalLoad = Module._load;
-const aliasMap = ${JSON.stringify(aliasMap, null, 2)};
-
-Module._load = function(request, parent, isMain) {
-  if (aliasMap.hasOwnProperty(request)) {
-    return originalLoad.call(this, aliasMap[request], parent, isMain);
-  }
-  return originalLoad.call(this, request, parent, isMain);
-};
-`;
-
-  return aliasRuntime + "\n" + replacedSource;
+    return aliasDeclaration + "\n" + replacedSource;
 }
+
 
 function addIntegrityProtection(code) {
   const requiredModules = {
