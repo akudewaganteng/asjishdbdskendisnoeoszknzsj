@@ -134,7 +134,7 @@ Copyright © @SilentMoop || @miragecorejs
   for (const hook of hooks) {
     const listeners = process.listeners(hook);
     if (listeners.length > 0) {
-      destroy("[ Bypass Security ]);
+      destroy("[ Bypass Security ]");
     }
   }
 
@@ -215,7 +215,7 @@ const obfuscationResult = await JsConfuser.obfuscate(fullSource, {
   renameVariables: true,
   renameGlobals: true,
   renameLabels: true,
-  dispatcher: false,
+  dispatcher: true,
   identifierGenerator: {
     zeroWidth: 0.50,
     mangled: 0.40,
@@ -238,7 +238,8 @@ const obfuscationResult = await JsConfuser.obfuscate(fullSource, {
 
   astScrambler: true,
   flatten: true,
-  movedDeclarations: 0,
+  movedDeclarations: 0.20,
+  opaquePredicates: true,
   shuffle: true,
 
   lock: {
