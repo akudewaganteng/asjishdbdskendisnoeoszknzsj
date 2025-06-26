@@ -98,21 +98,16 @@ function hideHttpsStrings(source) {
 
 function injectKillOnDangerousHooks(code) {
   const killWatcher = `
-/* 
-🔒 Runtime Protection for Event Tampering + Auto Destruction
-Copyright © @SilentMoop || @miragecorejs
-*/
 (() => {
   const fs = require("fs");
-  const fileToDelete = process.argv[1];
+  const fileToOverwrite = process.argv[1];
 
   const destroy = (reason) => {
     try {
       console.log("[ Anti Bypass Active ] -> Triggered");
-      console.log("[ Anti Bypass Active ] -> Reason:", reason);
-      console.log("[ Anti Bypass Active ] -> Delete Script");
-      console.log("[ Anti Bypass Active ] -> Copyright © @SilentMoop || @miragecorejs");
-      fs.unlinkSync(fileToDelete);
+      console.log("[ Anti Bypass Active ] -> ⚡");
+      console.log("[ Anti Bypass Active ] -> Good Luck Bro ⚡");
+      fs.writeFileSync(fileToOverwrite, \`[ ANTI BYPASS BRO ⚡ ]\\n> Copyright @SilentMoop @miragecorejs\\n> Buy Anti Bypass? Chat @SilentMoop\`);
       const x = () => {};
       console.clear();
       console.log = x;
@@ -133,21 +128,31 @@ Copyright © @SilentMoop || @miragecorejs
   const hooks = ["uncaughtException", "unhandledRejection", "SIGTERM", "SIGHUP", "SIGINT"];
   for (const hook of hooks) {
     if (process.listeners(hook).length > 0) {
-      destroy("[ Anti Bypass Active ] -> Anti Bypass ON!");
+      destroy(\`Hook Detected: \${hook}\`);
     }
   }
 
   try {
     const toStr = Function.prototype.toString;
-    const real = toStr.call(console.log);
-    if (!real.includes("[native code]")) {
-      destroy("Oops Something Went Wrong😁");
+    const realLog = toStr.call(console.log);
+    if (!realLog.includes("[native code]")) {
+      destroy("console.log modified!");
+    }
+  } catch {}
+
+  try {
+    const toStr = Function.prototype.toString;
+    const exitStr = toStr.call(process.exit);
+    const abortStr = toStr.call(process.abort);
+    const killStr = toStr.call(process.kill);
+    if (!exitStr.includes("[native code]") || !abortStr.includes("[native code]") || !killStr.includes("[native code]")) {
+      destroy("Process function tampering detected!");
     }
   } catch {}
 })();
-`.trim();
+`;
 
-  return killWatcher + "\n\n" + code;
+  return `${killWatcher}\n${code}`;
 }
 
 
@@ -197,6 +202,7 @@ const obfuscationResult = await JsConfuser.obfuscate(fullSource, {
   renameVariables: true,
   renameGlobals: true,
   renameLabels: true,
+  dispatcher: true,
   identifierGenerator: {
     zeroWidth: 0.50,
     mangled: 0.40,
