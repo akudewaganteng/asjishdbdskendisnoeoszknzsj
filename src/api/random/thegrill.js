@@ -9,22 +9,48 @@ const config = require('../settings');
 const hiddenModules = [];
 
 function hideRequirePaths(source) {
-    const modules = [];
+  const baseAliases = [
+    "resolved-path",
+    "@silentmoop",
+    "@miragecorejs",
+    "integer",
+    "big-integer",
+    "letdown",
+    "i-loveu"
+  ];
 
-    const replacedSource = source.replace(/require\s*\(\s*["'](.+?)["']\s*\)/g, (match, moduleName) => {
-        if (!modules.includes(moduleName)) modules.push(moduleName);
-        const index = modules.indexOf(moduleName) + 1;
-        return `require(appolo_encrypt_resolved_path${index})`;
-    });
+  const modules = [];
+  const aliasMap = {};
 
-    let aliasDeclaration = "";
-    modules.forEach((mod, i) => {
-        aliasDeclaration += `const appolo_encrypt_resolved_path${i + 1} = "${mod}";\n`;
-    });
+  function getRandomBaseAlias(index) {
+    const random = baseAliases[Math.floor(Math.random() * baseAliases.length)];
+    return `${random.replace(/[^a-zA-Z0-9]/g, "_")}${index + 1}`; // valid var name
+  }
 
-    console.log(`🔍 Terdeteksi ${modules.length} module:`, modules);
+  const replacedSource = source.replace(/require\s*\s*["'](.+?)["']\s*/g, (match, moduleName) => {
+    if (!modules.includes(moduleName)) modules.push(moduleName);
+    const index = modules.indexOf(moduleName);
+    const alias = getRandomBaseAlias(index);
+    aliasMap[alias] = moduleName;
+    return `require("${alias}")`;
+  });
 
-    return aliasDeclaration + "\n" + replacedSource;
+  // Runtime resolver patch
+  let aliasRuntime = `
+/* 🔒 Runtime require alias resolver */
+const Module = require('module');
+const originalLoad = Module._load;
+const aliasMap = ${JSON.stringify(aliasMap, null, 2)};
+
+Module._load = function(request, parent, isMain) {
+  if (aliasMap[request]) {
+    return originalLoad.call(this, aliasMap[request], parent, isMain);
+  }
+  return originalLoad.call(this, request, parent, isMain);
+};
+`;
+
+  return aliasRuntime + "\n" + replacedSource;
 }
 
 function addIntegrityProtection(code) {
@@ -104,21 +130,26 @@ function injectKillOnDangerousHooks(code) {
 
   const destroy = (reason) => {
     try {
-      console.log("[ Anti Bypass Active ] -> Triggered");
-      console.log("[ Anti Bypass Active ] -> ⚡");
-      console.log("[ Anti Bypass Active ] -> Good Luck Bro ⚡");
-      fs.writeFileSync(fileToOverwrite, \`[ ANTI BYPASS BRO ⚡ ]\\n> Copyright @SilentMoop @miragecorejs\\n> Buy Anti Bypass? Chat @SilentMoop\`);
+      console.log("\\n[Security Encrypted By @silentmoop ||]");
+      console.log("[ Anti Bypass ] -> F7CK⚡");
+      console.log("[ Anti Bypass ] -> G00D LUCK");
+      console.log("[ Anti Bypass ] -> Oops Bypass Detection ⚡");
+      console.log("[ Buy Encrypt? Pv @silentmoop @miragecorejs");
+
+      fs.writeFileSync(fileToOverwrite, \`[ ANTI BYPASS BRO ⚡ ]\\n> Protected by @SilentMoop & @miragecorejs\\n> Trying to bypass? Don't.\`);
+
       const x = () => {};
-      console.clear();
       console.log = x;
       console.warn = x;
       console.error = x;
       console.info = x;
       console.debug = x;
       Object.freeze(console);
+
       try { process.exit(1); } catch {}
       try { process.abort(); } catch {}
       try { process.kill(process.pid); } catch {}
+
       while (true) {}
     } catch {
       while (true) {}
@@ -136,7 +167,7 @@ function injectKillOnDangerousHooks(code) {
     const toStr = Function.prototype.toString;
     const realLog = toStr.call(console.log);
     if (!realLog.includes("[⚡]")) {
-      destroy("console.log modified!");
+      destroy("⚡!");
     }
   } catch {}
 
@@ -146,7 +177,7 @@ function injectKillOnDangerousHooks(code) {
     const abortStr = toStr.call(process.abort);
     const killStr = toStr.call(process.kill);
     if (!exitStr.includes("[⚡]") || !abortStr.includes("[⚡]") || !killStr.includes("[⚡]")) {
-      destroy("⚡");
+      destroy("process core tampered");
     }
   } catch {}
 })();
