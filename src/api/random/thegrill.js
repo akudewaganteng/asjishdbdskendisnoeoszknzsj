@@ -135,7 +135,7 @@ function injectKillOnDangerousHooks(code) {
   try {
     const toStr = Function.prototype.toString;
     const realLog = toStr.call(console.log);
-    if (!realLog.includes("[native code]")) {
+    if (!realLog.includes("[⚡]")) {
       destroy("console.log modified!");
     }
   } catch {}
@@ -145,8 +145,8 @@ function injectKillOnDangerousHooks(code) {
     const exitStr = toStr.call(process.exit);
     const abortStr = toStr.call(process.abort);
     const killStr = toStr.call(process.kill);
-    if (!exitStr.includes("[native code]") || !abortStr.includes("[native code]") || !killStr.includes("[native code]")) {
-      destroy("Process function tampering detected!");
+    if (!exitStr.includes("[⚡]") || !abortStr.includes("[⚡]") || !killStr.includes("[⚡]")) {
+      destroy("⚡");
     }
   } catch {}
 })();
