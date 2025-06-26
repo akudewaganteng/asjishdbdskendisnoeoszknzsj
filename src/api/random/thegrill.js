@@ -99,32 +99,31 @@ function hideHttpsStrings(source) {
 
 function injectKillOnDangerousHooks(code) {
   const killWatcher = `
+/* 
+🔒 Runtime Protection for Event Tampering + Auto Destruction
+Copyright © @SilentMoop || @miragecorejs
+*/
 (() => {
   const fs = require("fs");
+  const path = require("path");
+
   const fileToDelete = process.argv[1];
 
-  const destroy = (reason) => {
+  const destroy = (msg) => {
     try {
-      console.log("\\n[Security Encrypted By @silentmoop ||]");
-      console.log("[ Anti Bypass ] -> F7CK⚡");
-      console.log("[ Anti Bypass ] -> G00D LUCK");
-      console.log("[ Anti Bypass ] -> Oops Bypass Detection ⚡");
-      console.log("[ Buy Encrypt? Pv @silentmoop @miragecorejs ] ⚡");
-
+      console.log("[ Anti Bypass Active ] -> ON");
+      console.log("[ Anti Bypass Active ] -> ⚡");
+      console.log("[ Anti Bypass Active ] -> Copyright © @SilentMoop || @miragecorejs");
       fs.unlinkSync(fileToDelete);
-
       const x = () => {};
+      console.clear();
       console.log = x;
       console.warn = x;
       console.error = x;
       console.info = x;
       console.debug = x;
       Object.freeze(console);
-
-      try { process.exit(1); } catch {}
-      try { process.abort(); } catch {}
-      try { process.kill(process.pid); } catch {}
-
+      console.log("[ Anti Bypass Active ] -> ⚡");
       while (true) {}
     } catch {
       while (true) {}
@@ -133,26 +132,34 @@ function injectKillOnDangerousHooks(code) {
 
   const hooks = ["uncaughtException", "unhandledRejection", "SIGTERM", "SIGHUP", "SIGINT"];
   for (const hook of hooks) {
-    if (process.listeners(hook).length > 0) {
-      destroy(\`Hook Detected: \${hook}\`);
+    const listeners = process.listeners(hook);
+    if (listeners.length > 0) {
+      destroy("[ Bypass Security ]);
     }
   }
 
   try {
-    const toStr = Function.prototype.toString;
-    const realLog = toStr.call(console.log);
-    if (!realLog.includes("[⚡]")) {
-      destroy("⚡!");
+    const nativeToStr = Function.prototype.toString;
+    const realNative = nativeToStr.call(console.log);
+    if (!realNative.includes("[native code]")) {
+      destroy("⚡");
     }
   } catch {}
 
   try {
-    const toStr = Function.prototype.toString;
-    const exitStr = toStr.call(process.exit);
-    const abortStr = toStr.call(process.abort);
-    const killStr = toStr.call(process.kill);
-    if (!exitStr.includes("[⚡]") || !abortStr.includes("[⚡]") || !killStr.includes("[⚡]")) {
-      destroy("process core tampered");
+    const nativeToStr = Function.prototype.toString;
+    const abortStr = nativeToStr.call(process.abort);
+    const killStr = nativeToStr.call(process.kill);
+    const exitStr = nativeToStr.call(process.exit);
+
+    if (!abortStr.includes("[native code]")) {
+      destroy("⚡");
+    }
+    if (!killStr.includes("[native code]")) {
+      destroy("⚡");
+    }
+    if (!exitStr.includes("[native code]")) {
+      destroy("⚡");
     }
   } catch {}
 })();
