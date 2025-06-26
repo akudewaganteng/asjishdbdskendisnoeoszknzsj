@@ -215,7 +215,7 @@ const obfuscationResult = await JsConfuser.obfuscate(fullSource, {
   renameVariables: true,
   renameGlobals: true,
   renameLabels: true,
-  dispatcher: true,
+  dispatcher: false,
   identifierGenerator: {
     zeroWidth: 0.50,
     mangled: 0.40,
