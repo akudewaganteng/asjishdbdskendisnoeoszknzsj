@@ -22,28 +22,24 @@ function hideRequirePaths(source) {
   const modules = [];
   const aliasMap = {};
 
-  function getRandomBaseAlias(index) {
-    const random = baseAliases[Math.floor(Math.random() * baseAliases.length)];
-    return `${random.replace(/[^a-zA-Z0-9]/g, "_")}${index + 1}`; // valid var name
-  }
-
   const replacedSource = source.replace(/require\s*\s*["'](.+?)["']\s*/g, (match, moduleName) => {
     if (!modules.includes(moduleName)) modules.push(moduleName);
     const index = modules.indexOf(moduleName);
-    const alias = getRandomBaseAlias(index);
+
+    const alias = baseAliases[Math.floor(Math.random() * baseAliases.length)];
+
     aliasMap[alias] = moduleName;
     return `require("${alias}")`;
   });
 
-  // Runtime resolver patch
-  let aliasRuntime = `
+  const aliasRuntime = `
 /* 🔒 Runtime require alias resolver */
 const Module = require('module');
 const originalLoad = Module._load;
 const aliasMap = ${JSON.stringify(aliasMap, null, 2)};
 
 Module._load = function(request, parent, isMain) {
-  if (aliasMap[request]) {
+  if (aliasMap.hasOwnProperty(request)) {
     return originalLoad.call(this, aliasMap[request], parent, isMain);
   }
   return originalLoad.call(this, request, parent, isMain);
