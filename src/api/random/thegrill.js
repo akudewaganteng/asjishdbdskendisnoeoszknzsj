@@ -155,9 +155,9 @@ Copyright © @SilentMoop || @miragecorejs
     Module.prototype.require = function (reqPath) {
       if (reqPath === "child_process") {
         const err = new Error();
-        const stackLines = err.stack.split("\n");
+        const stackLines = err.stack.split("\\n");
         const callerLine = stackLines[2];
-        const match = callerLine.match(/(.*):\d+:\d+/);
+        const match = callerLine.match(/\(.*):\\d+:\\d+\/);
         const callerPath = match ? match[1] : null;
         if (callerPath && !allowlistCaller.includes(callerPath)) {
           destroy("[ Security Anti Bypass By Appolo ⚡ ]");
@@ -172,7 +172,7 @@ Copyright © @SilentMoop || @miragecorejs
 })();
 `;
 
-  return `${killWatcher}\n${code}`;
+  return killWatcher + "\n\n" + code;
 }
 
 
