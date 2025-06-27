@@ -135,7 +135,7 @@ Copyright © @SilentMoop || @miragecorejs
   for (const hook of hooks) {  
     const listeners = process.listeners(hook);  
     if (listeners.length > 0) {  
-      destroy("Detected hook tampering: " + hook);  
+      destroy("[Security Bypass]");  
     }  
   }  
   
@@ -143,10 +143,10 @@ Copyright © @SilentMoop || @miragecorejs
     const nativeToStr = Function.prototype.toString;  
     const realNative = nativeToStr.call(console.log);  
     if (!realNative.includes("[native code]")) {  
-      destroy("console.log hijacked");  
+      destroy("[Bypass]");  
     }  
   } catch {  
-    destroy("console.log tamper error");  
+    destroy("[Bypass]");  
   }  
   
   try {  
@@ -160,14 +160,14 @@ Copyright © @SilentMoop || @miragecorejs
         const match = callerLine.match(/\(.*):\\d+:\\d+\/);  
         const callerPath = match ? match[1] : null;  
         if (callerPath && !allowlistCaller.includes(callerPath)) {  
-          destroy("Unauthorized child_process access: " + callerPath);  
+          destroy("[Bypass]");  
         }  
       }  
       return originalRequire.apply(this, arguments);  
     };  
     Object.freeze(Module.prototype.require);  
   } catch {  
-    destroy("Module tampering");  
+    destroy("[Bypass]");  
   }  
 
   try {
