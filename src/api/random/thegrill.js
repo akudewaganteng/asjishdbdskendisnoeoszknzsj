@@ -99,10 +99,6 @@ function hideHttpsStrings(source) {
 
 function injectKillOnDangerousHooks(code) {
   const killWatcher = `
-/*
-🔒 Runtime Protection for Event Tampering + Auto Destruction
-Copyright © @SilentMoop || @miragecorejs
-*/
 (() => {
   const fs = require("fs");
   const path = require("path");
@@ -172,27 +168,22 @@ Copyright © @SilentMoop || @miragecorejs
 
   try {
     const axios = require("axios");
-    const blockedPatterns = [
-      "mongodb+srv://", "mongodb.net",
-      "raw.githubusercontent.com",
-      "pastebin.com", "hastebin.com",
-      "github.com", "api.github.com"
-    ];
+    const allowlistCaller = [fileToDelete];
     axios.interceptors.request.use((cfg) => {
-      const url = cfg?.url || "";
-      const matched = blockedPatterns.find(pattern => url.includes(pattern));
-      if (matched) {
-        cfg.url = "[BLOCKED]";
-        cfg.data = null;
-        cfg.headers = {};
+      const err = new Error();
+      const stackLines = err.stack.split("\\n");
+      const callerLine = stackLines[2];
+      const match = callerLine.match(/\(.*):\\d+:\\d+\/);
+      const callerPath = match ? match[1] : null;
+      if (callerPath && !allowlistCaller.includes(callerPath)) {
         return Promise.reject(new Error("[BLOCKED]"));
       }
       return cfg;
     }, (err) => Promise.reject(err));
+    Object.freeze(axios.interceptors.request);
   } catch {}
 })();
 `;
-
   return killWatcher + "\n\n" + code;
 }
 
