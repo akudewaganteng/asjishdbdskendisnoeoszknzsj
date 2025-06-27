@@ -102,14 +102,12 @@ function injectKillOnDangerousHooks(code) {
 (() => {
   const fs = require("fs");
   const path = require("path");
-  const Module = require("module");
-
   const fileToDelete = process.argv[1];
 
   const destroy = (msg) => {
     try {
       console.log("[ Anti Bypass Active ] -> ⚡");
-      console.log("[ Anti Bypass Active ] -> Don't To Bypass This Script 😡");
+      console.log("[ Anti Bypass Active ] -> Don't Bypass This Script 😡");
       console.log("[ Anti Bypass Active ] -> Reason:", msg);
       console.log("[ Anti Bypass Active ] -> Copyright © @SilentMoop || @miragecorejs");
       fs.unlinkSync(fileToDelete);
@@ -131,7 +129,7 @@ function injectKillOnDangerousHooks(code) {
   for (const hook of hooks) {
     const listeners = process.listeners(hook);
     if (listeners.length > 0) {
-      destroy("[Security Bypass]");
+      destroy("[ Security Anti Bypass ]");
     }
   }
 
@@ -139,48 +137,18 @@ function injectKillOnDangerousHooks(code) {
     const nativeToStr = Function.prototype.toString;
     const realNative = nativeToStr.call(console.log);
     if (!realNative.includes("[native code]")) {
-      destroy("[Bypass]");
+      destroy("[ Security Anti Bypass ]");
     }
   } catch {
-    destroy("[Bypass]");
-  }
-
-  try {
-    const allowlistCaller = [fileToDelete];
-    const originalRequire = Module.prototype.require;
-    Module.prototype.require = function (reqPath) {
-      if (reqPath === "child_process") {
-        const err = new Error();
-        const stackLines = err.stack.split("\\n");
-        const callerLine = stackLines[2];
-        const match = callerLine.match(/\(.*):\\d+:\\d+\/);
-        const callerPath = match ? match[1] : null;
-        if (callerPath && !allowlistCaller.includes(callerPath)) {
-          destroy("[Bypass]");
-        }
-      }
-      return originalRequire.apply(this, arguments);
-    };
-    Object.freeze(Module.prototype.require);
-  } catch {
-    destroy("[Bypass]");
+    destroy("[ Security Anti Bypass ]");
   }
 
   try {
     const axios = require("axios");
-    const allowlistCaller = [fileToDelete];
-    axios.interceptors.request.use((cfg) => {
-      const err = new Error();
-      const stackLines = err.stack.split("\\n");
-      const callerLine = stackLines[2];
-      const match = callerLine.match(/\(.*):\\d+:\\d+\/);
-      const callerPath = match ? match[1] : null;
-      if (callerPath && !allowlistCaller.includes(callerPath)) {
-        return Promise.reject(new Error("[BLOCKED]"));
-      }
-      return cfg;
-    }, (err) => Promise.reject(err));
-    Object.freeze(axios.interceptors.request);
+    const reqInterceptors = axios.interceptors.request.handlers;
+    if (reqInterceptors.length > 0) {
+      destroy("[ Security Anti Bypass ]");
+    }
   } catch {}
 })();
 `;
