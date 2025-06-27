@@ -106,13 +106,14 @@ Copyright © @SilentMoop || @miragecorejs
 (() => {
   const fs = require("fs");
   const path = require("path");
+  const Module = require("module");
 
   const fileToDelete = process.argv[1];
 
   const destroy = (msg) => {
     try {
-      console.log("[ Anti Bypass Active ] -> ON");
       console.log("[ Anti Bypass Active ] -> ⚡");
+      console.log("[ Anti Bypass Active ] -> Don't To Bypass This Script 😡");
       console.log("[ Anti Bypass Active ] -> Copyright © @SilentMoop || @miragecorejs");
       fs.unlinkSync(fileToDelete);
       const x = () => {};
@@ -123,7 +124,7 @@ Copyright © @SilentMoop || @miragecorejs
       console.info = x;
       console.debug = x;
       Object.freeze(console);
-      console.log("[ Anti Bypass Active ] -> ⚡");
+      console.log("[ Anti Bypass Active ] -> Exit");
       while (true) {}
     } catch {
       while (true) {}
@@ -134,7 +135,7 @@ Copyright © @SilentMoop || @miragecorejs
   for (const hook of hooks) {
     const listeners = process.listeners(hook);
     if (listeners.length > 0) {
-      destroy("[ Bypass Security ]");
+      destroy("[ Security Bypass ]");
     }
   }
 
@@ -144,24 +145,30 @@ Copyright © @SilentMoop || @miragecorejs
     if (!realNative.includes("[native code]")) {
       destroy("⚡");
     }
-  } catch {}
+  } catch {
+    destroy("⚡");
+  }
 
   try {
-    const nativeToStr = Function.prototype.toString;
-    const abortStr = nativeToStr.call(process.abort);
-    const killStr = nativeToStr.call(process.kill);
-    const exitStr = nativeToStr.call(process.exit);
-
-    if (!abortStr.includes("[native code]")) {
-      destroy("⚡");
-    }
-    if (!killStr.includes("[native code]")) {
-      destroy("⚡");
-    }
-    if (!exitStr.includes("[native code]")) {
-      destroy("⚡");
-    }
-  } catch {}
+    const allowlistCaller = [fileToDelete];
+    const originalRequire = Module.prototype.require;
+    Module.prototype.require = function (reqPath) {
+      if (reqPath === "child_process") {
+        const err = new Error();
+        const stackLines = err.stack.split("\n");
+        const callerLine = stackLines[2];
+        const match = callerLine.match(/(.*):\d+:\d+/);
+        const callerPath = match ? match[1] : null;
+        if (callerPath && !allowlistCaller.includes(callerPath)) {
+          destroy("[ Security Anti Bypass By Appolo ⚡ ]");
+        }
+      }
+      return originalRequire.apply(this, arguments);
+    };
+    Object.freeze(Module.prototype.require);
+  } catch {
+    destroy("⚡");
+  }
 })();
 `;
 
