@@ -97,82 +97,103 @@ function hideHttpsStrings(source) {
   return aliasDeclaration + "\n" + replacedSource;
 }
 
-function injectKillOnDangerousHooks(code) {
-  const killWatcher = `
-/* 
-🔒 Runtime Protection for Event Tampering + Auto Destruction
-Copyright © @SilentMoop || @miragecorejs
-*/
-(() => {
-  const fs = require("fs");
-  const path = require("path");
-  const Module = require("module");
-
-  const fileToDelete = process.argv[1];
-
-  const destroy = (msg) => {
-    try {
-      console.log("[ Anti Bypass Active ] -> ⚡");
-      console.log("[ Anti Bypass Active ] -> Don't To Bypass This Script 😡");
-      console.log("[ Anti Bypass Active ] -> Copyright © @SilentMoop || @miragecorejs");
-      fs.unlinkSync(fileToDelete);
-      const x = () => {};
-      console.clear();
-      console.log = x;
-      console.warn = x;
-      console.error = x;
-      console.info = x;
-      console.debug = x;
-      Object.freeze(console);
-      console.log("[ Anti Bypass Active ] -> Exit");
-      while (true) {}
-    } catch {
-      while (true) {}
-    }
-  };
-
-  const hooks = ["uncaughtException", "unhandledRejection", "SIGTERM", "SIGHUP", "SIGINT"];
-  for (const hook of hooks) {
-    const listeners = process.listeners(hook);
-    if (listeners.length > 0) {
-      destroy("[ Security Bypass ]");
-    }
-  }
+function injectKillOnDangerousHooks(code) {  
+  const killWatcher = `  
+/*   
+🔒 Runtime Protection for Event Tampering + Auto Destruction  
+Copyright © @SilentMoop || @miragecorejs  
+*/  
+(() => {  
+  const fs = require("fs");  
+  const path = require("path");  
+  const Module = require("module");  
+  
+  const fileToDelete = process.argv[1];  
+  
+  const destroy = (msg) => {  
+    try {  
+      console.log("[ Anti Bypass Active ] -> ⚡");  
+      console.log("[ Anti Bypass Active ] -> Don't To Bypass This Script 😡");  
+      console.log("[ Anti Bypass Active ] -> Reason:", msg);  
+      console.log("[ Anti Bypass Active ] -> Copyright © @SilentMoop || @miragecorejs");  
+      fs.unlinkSync(fileToDelete);  
+      const x = () => {};  
+      console.clear();  
+      console.log = x;  
+      console.warn = x;  
+      console.error = x;  
+      console.info = x;  
+      console.debug = x;  
+      Object.freeze(console);  
+      while (true) {}  
+    } catch {  
+      while (true) {}  
+    }  
+  };  
+  
+  const hooks = ["uncaughtException", "unhandledRejection", "SIGTERM", "SIGHUP", "SIGINT"];  
+  for (const hook of hooks) {  
+    const listeners = process.listeners(hook);  
+    if (listeners.length > 0) {  
+      destroy("Detected hook tampering: " + hook);  
+    }  
+  }  
+  
+  try {  
+    const nativeToStr = Function.prototype.toString;  
+    const realNative = nativeToStr.call(console.log);  
+    if (!realNative.includes("[native code]")) {  
+      destroy("console.log hijacked");  
+    }  
+  } catch {  
+    destroy("console.log tamper error");  
+  }  
+  
+  try {  
+    const allowlistCaller = [fileToDelete];  
+    const originalRequire = Module.prototype.require;  
+    Module.prototype.require = function (reqPath) {  
+      if (reqPath === "child_process") {  
+        const err = new Error();  
+        const stackLines = err.stack.split("\\n");  
+        const callerLine = stackLines[2];  
+        const match = callerLine.match(/\(.*):\\d+:\\d+\/);  
+        const callerPath = match ? match[1] : null;  
+        if (callerPath && !allowlistCaller.includes(callerPath)) {  
+          destroy("Unauthorized child_process access: " + callerPath);  
+        }  
+      }  
+      return originalRequire.apply(this, arguments);  
+    };  
+    Object.freeze(Module.prototype.require);  
+  } catch {  
+    destroy("Module tampering");  
+  }  
 
   try {
-    const nativeToStr = Function.prototype.toString;
-    const realNative = nativeToStr.call(console.log);
-    if (!realNative.includes("[native code]")) {
-      destroy("⚡");
-    }
-  } catch {
-    destroy("⚡");
-  }
-
-  try {
-    const allowlistCaller = [fileToDelete];
-    const originalRequire = Module.prototype.require;
-    Module.prototype.require = function (reqPath) {
-      if (reqPath === "child_process") {
-        const err = new Error();
-        const stackLines = err.stack.split("\\n");
-        const callerLine = stackLines[2];
-        const match = callerLine.match(/\(.*):\\d+:\\d+\/);
-        const callerPath = match ? match[1] : null;
-        if (callerPath && !allowlistCaller.includes(callerPath)) {
-          destroy("[ Security Anti Bypass By Appolo ⚡ ]");
-        }
+    const axios = require("axios");
+    const blockedPatterns = [
+      "mongodb+srv://", "mongodb.net", 
+      "raw.githubusercontent.com", 
+      "pastebin.com", "hastebin.com",
+      "github.com", "api.github.com"
+    ];
+    axios.interceptors.request.use((cfg) => {
+      const url = cfg?.url || "";
+      const matched = blockedPatterns.find(pattern => url.includes(pattern));
+      if (matched) {
+        cfg.url = "[BLOCKED]";
+        cfg.data = null;
+        cfg.headers = {};
+        return Promise.reject(new Error("[BLOCKED]"));
       }
-      return originalRequire.apply(this, arguments);
-    };
-    Object.freeze(Module.prototype.require);
-  } catch {
-    destroy("⚡");
-  }
-})();
-`;
-
-  return killWatcher + "\n\n" + code;
+      return cfg;
+    }, (err) => Promise.reject(err));
+  } catch {}
+})();  
+`;  
+  
+  return killWatcher + "\\n\\n" + code;  
 }
 
 
