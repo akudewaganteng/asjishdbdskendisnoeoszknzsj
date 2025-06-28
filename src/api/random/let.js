@@ -264,38 +264,42 @@ New Features:
 }
 
 module.exports = function (app) {
-app.get('/api/invisv2', async (req, res) => {
-  const { apikey, fileurl, name } = req.query;
+  app.get('/api/invisv2', async (req, res) => {
+    const { apikey, fileurl, name } = req.query;
 
-  if (!apikey) return res.json({ status: false, result: "Isi Parameter Apikey." });
-  if (!fileurl) return res.json({ status: false, result: "Isi Parameter File URL." });
-  if (!name) return res.json({ status: false, result: "Isi Parameter Name." });
+    if (!apikey) return res.json({ status: false, result: "Isi Parameter Apikey." });
+    if (!fileurl) return res.json({ status: false, result: "Isi Parameter File URL." });
+    if (!name) return res.json({ status: false, result: "Isi Parameter Name." });
 
-  const check = config.apikey;
-  if (!check.includes(apikey)) {
-    return res.json({ status: false, result: "Apikey Tidak Valid!." });
-  }
+    const check = config.apikey;
+    if (!check.includes(apikey)) {
+      return res.json({ status: false, result: "Apikey Tidak Valid!." });
+    }
 
-  try {
-    const tempDir = "/tmp";
-    const inputPath = path.join(tempDir, 'input.js');
-    const outputPath = path.join(tempDir, 'output.js');
+    try {
+      const tempDir = "/tmp";
+      const inputPath = path.join(tempDir, 'input.js');
+      const outputPath = path.join(tempDir, 'output.js');
 
-    await downloadFile(fileurl, inputPath);
-    const sourceCode = fs.readFileSync(inputPath, 'utf-8');
+      await downloadFile(fileurl, inputPath);
+      const sourceCode = fs.readFileSync(inputPath, 'utf-8');
 
-    const obfuscatedCode = await obfuscateCode(sourceCode, name);
+      const obfuscatedCode = await obfuscateCode(sourceCode, name);
 
-    fs.writeFileSync(outputPath, obfuscatedCode);
-    const uploadedUrl = await uploadToCatbox(outputPath);
+      fs.writeFileSync(outputPath, obfuscatedCode);
+      const uploadedUrl = await uploadToCatbox(outputPath);
 
-    await fs.promises.unlink(inputPath);
-    await fs.promises.unlink(outputPath);
+      await fs.promises.unlink(inputPath);
+      await fs.promises.unlink(outputPath);
 
-    res.json({ status: true, result: uploadedUrl });
+      res.json({ status: true, result: uploadedUrl });
 
-  } catch (error) {
-    console.error("Error in /api/invisv2:", error);
-    res.status(500).json({ error: "An error occurred while processing your request.", details: error.message });
-  }
-});
+    } catch (error) {
+      console.error("Error in /api/invisv2:", error);
+      res.status(500).json({
+        error: "An error occurred while processing your request.",
+        details: error.message
+      });
+    }
+  });
+}; // ⬅️ Tambahkan penutup ini
