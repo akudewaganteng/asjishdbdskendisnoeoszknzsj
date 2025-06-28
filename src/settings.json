@@ -176,8 +176,14 @@
           "path": "/api/invisobfuscate?apikey=&fileurl=",
           "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
         },
+          {
+          "name": "Invis + Anti Bypass + Path Hide",
+          "desc": "Javascript Obfuscated",
+          "path": "/api/invisv2?apikey=&fileurl=&name=",
+          "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
+        },
         {
-          "name": "Path Obfuscated V1",
+          "name": "Anti Bypass + Path Hide",
           "desc": "Javascript Obfuscated",
           "path": "/api/pathketutup?apikey=&fileurl=",
           "innerDesc": "Buy apikey: t.me/@tearsinsilencee"
